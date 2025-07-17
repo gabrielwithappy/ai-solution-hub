@@ -61,9 +61,9 @@ export default function EnglishSentencePage() {
                 💡 사용 예시
               </h3>
               <ul className="text-sm text-blue-800 space-y-1">
-                <li>• cat (고양이)</li>
-                <li>• study (공부하다)</li>
-                <li>• beautiful (아름다운)</li>
+                <li>cat</li>
+                <li>study</li>
+                <li>beautiful</li>
               </ul>
             </div>
           </div>

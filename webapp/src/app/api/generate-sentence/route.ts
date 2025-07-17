@@ -8,7 +8,7 @@ import { callLLM } from '@/lib/llm-client';
 import { validateLLMConfig } from '@/lib/llm-config';
 
 export interface GenerateSentenceRequest {
-  text: string;
+  word: string;
   level: '초급' | '중급' | '고급';
 }
 
@@ -37,16 +37,16 @@ export async function POST(request: NextRequest) {
     // Request body 파싱 및 검증
     const body: GenerateSentenceRequest = await request.json();
     
-    if (!body.text || body.text.length === 0) {
+    if (!body.word || body.word.length === 0) {
       return NextResponse.json(
-        { error: '텍스트를 입력해주세요.' },
+        { error: '영어 단어를 입력해주세요.' },
         { status: 400 }
       );
     }
 
-    if (body.text.length > 500) {
+    if (body.word.length > 50) {
       return NextResponse.json(
-        { error: '텍스트는 500자 이하로 입력해주세요.' },
+        { error: '단어는 50자 이하로 입력해주세요.' },
         { status: 400 }
       );
     }
@@ -59,14 +59,15 @@ export async function POST(request: NextRequest) {
     }
 
     // 🤖 LLM 프롬프트 생성
-    const prompt = `다음 텍스트를 기반으로 ${body.level} 수준의 영어 예문 3개를 만들어주세요.
+    const prompt = `다음 영어 단어를 사용한 ${body.level} 수준의 영어 예문 3개를 만들어주세요.
 
-텍스트: "${body.text}"
+단어: "${body.word}"
 
 요구사항:
 - ${body.level} 수준에 맞는 어휘와 문법 사용
-- 자연스럽고 실용적인 문장
+- 주어진 단어가 반드시 포함된 자연스럽고 실용적인 문장
 - 각 문장은 독립적이고 완전한 문장이어야 함
+- 단어의 다양한 용법을 보여주는 문장들
 
 형식: 번호 없이 문장만 작성하고, 각 문장은 새 줄로 구분`;
 

@@ -23,7 +23,7 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     render(<EnglishSentenceForm onResult={mockOnResult} />);
 
     // Then: 필요한 요소들이 표시된다
-    expect(screen.getByLabelText(/영어 문장 입력/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/영어 단어 입력/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/난이도 선택/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /문장 생성/i })).toBeInTheDocument();
     
@@ -33,18 +33,18 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     expect(screen.getByText('고급')).toBeInTheDocument();
   });
 
-  test('텍스트 입력과 레벨 선택이 작동한다', async () => {
+  test('단어 입력과 레벨 선택이 작동한다', async () => {
     const user = userEvent.setup();
     
     // When: 컴포넌트 렌더링
     render(<EnglishSentenceForm onResult={mockOnResult} />);
     
-    const textInput = screen.getByLabelText(/영어 문장 입력/i);
+    const wordInput = screen.getByLabelText(/영어 단어 입력/i);
     const levelSelect = screen.getByLabelText(/난이도 선택/i);
 
-    // When: 텍스트 입력
-    await user.type(textInput, 'I love programming');
-    expect(textInput).toHaveValue('I love programming');
+    // When: 단어 입력
+    await user.type(wordInput, 'cat');
+    expect(wordInput).toHaveValue('cat');
 
     // When: 레벨 변경
     await user.selectOptions(levelSelect, '중급');
@@ -58,7 +58,7 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        sentences: ['I enjoy coding daily.', 'Programming is my passion.', 'I code for fun.'],
+        sentences: ['I have a cat.', 'The cat is sleeping.', 'My cat likes fish.'],
         provider: 'openai'
       })
     } as Response);
@@ -66,12 +66,12 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     // When: 컴포넌트 렌더링
     render(<EnglishSentenceForm onResult={mockOnResult} />);
     
-    const textInput = screen.getByLabelText(/영어 문장 입력/i);
+    const wordInput = screen.getByLabelText(/영어 단어 입력/i);
     const levelSelect = screen.getByLabelText(/난이도 선택/i);
     const submitButton = screen.getByRole('button', { name: /문장 생성/i });
 
     // When: 폼 작성 및 제출
-    await user.type(textInput, 'I love programming');
+    await user.type(wordInput, 'cat');
     await user.selectOptions(levelSelect, '중급');
     await user.click(submitButton);
 
@@ -80,7 +80,7 @@ describe('EnglishSentenceForm 컴포넌트', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        text: 'I love programming',
+        word: 'cat',
         level: '중급'
       })
     });
@@ -88,13 +88,13 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     // Then: 결과 콜백 호출 확인
     await waitFor(() => {
       expect(mockOnResult).toHaveBeenCalledWith({
-        sentences: ['I enjoy coding daily.', 'Programming is my passion.', 'I code for fun.'],
+        sentences: ['I have a cat.', 'The cat is sleeping.', 'My cat likes fish.'],
         provider: 'openai'
       });
     });
   });
 
-  test('빈 텍스트로 제출 시 에러 메시지 표시', async () => {
+  test('빈 단어로 제출 시 에러 메시지 표시', async () => {
     const user = userEvent.setup();
     
     // When: 컴포넌트 렌더링
@@ -102,31 +102,31 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     
     const submitButton = screen.getByRole('button', { name: /문장 생성/i });
 
-    // When: 빈 텍스트로 제출
+    // When: 빈 단어로 제출
     await user.click(submitButton);
 
     // Then: 에러 메시지 표시
     await waitFor(() => {
-      expect(screen.getByText(/텍스트를 입력해주세요/i)).toBeInTheDocument();
+      expect(screen.getByText(/영어 단어를 입력해주세요/i)).toBeInTheDocument();
     });
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
-  test('500자 초과 텍스트 입력 시 에러 메시지 표시', async () => {
+  test('50자 초과 단어 입력 시 에러 메시지 표시', async () => {
     const user = userEvent.setup();
     
     // When: 컴포넌트 렌더링
     render(<EnglishSentenceForm onResult={mockOnResult} />);
     
-    const textInput = screen.getByLabelText(/영어 문장 입력/i);
-    const longText = 'a'.repeat(501);
+    const wordInput = screen.getByLabelText(/영어 단어 입력/i);
+    const longWord = 'a'.repeat(51);
 
-    // When: 긴 텍스트 입력 (paste로 한번에)
-    await user.click(textInput);
-    await user.paste(longText);
+    // When: 긴 단어 입력 (paste로 한번에)
+    await user.click(wordInput);
+    await user.paste(longWord);
 
     // Then: 글자 수 제한 표시
-    expect(screen.getByText(/500자를 초과할 수 없습니다/i)).toBeInTheDocument();
+    expect(screen.getByText(/50자를 초과할 수 없습니다/i)).toBeInTheDocument();
   });
 
   test('API 호출 중 로딩 상태 표시', async () => {
@@ -143,11 +143,11 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     // When: 컴포넌트 렌더링
     render(<EnglishSentenceForm onResult={mockOnResult} />);
     
-    const textInput = screen.getByLabelText(/영어 문장 입력/i);
+    const wordInput = screen.getByLabelText(/영어 단어 입력/i);
     const submitButton = screen.getByRole('button', { name: /문장 생성/i });
 
     // When: 폼 제출
-    await user.type(textInput, 'Test text');
+    await user.type(wordInput, 'cat');
     await user.click(submitButton);
 
     // Then: 로딩 상태 확인
@@ -169,11 +169,11 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     // When: 컴포넌트 렌더링
     render(<EnglishSentenceForm onResult={mockOnResult} />);
     
-    const textInput = screen.getByLabelText(/영어 문장 입력/i);
+    const wordInput = screen.getByLabelText(/영어 단어 입력/i);
     const submitButton = screen.getByRole('button', { name: /문장 생성/i });
 
     // When: 폼 제출
-    await user.type(textInput, 'Test text');
+    await user.type(wordInput, 'cat');
     await user.click(submitButton);
 
     // Then: 에러 메시지 확인
@@ -188,12 +188,12 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     // When: 컴포넌트 렌더링
     render(<EnglishSentenceForm onResult={mockOnResult} />);
     
-    const textInput = screen.getByLabelText(/영어 문장 입력/i);
+    const wordInput = screen.getByLabelText(/영어 단어 입력/i);
 
-    // When: 텍스트 입력
-    await user.type(textInput, 'Hello world');
+    // When: 단어 입력
+    await user.type(wordInput, 'hello');
 
     // Then: 글자 수 표시
-    expect(screen.getByText('11 / 500')).toBeInTheDocument();
+    expect(screen.getByText('5 / 50')).toBeInTheDocument();
   });
 });

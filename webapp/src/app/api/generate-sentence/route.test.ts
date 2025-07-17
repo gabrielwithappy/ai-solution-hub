@@ -96,14 +96,14 @@ describe('영어 문장 생성 API 로직', () => {
   });
 
   describe('입력값 검증 로직', () => {
-    test('빈 텍스트 검증', () => {
-      const text = '';
-      expect(text.length).toBe(0);
+    test('빈 단어 검증', () => {
+      const word = '';
+      expect(word.length).toBe(0);
     });
 
-    test('500자 초과 텍스트 검증', () => {
-      const longText = 'a'.repeat(501);
-      expect(longText.length).toBeGreaterThan(500);
+    test('50자 초과 단어 검증', () => {
+      const longWord = 'a'.repeat(51);
+      expect(longWord.length).toBeGreaterThan(50);
     });
 
     test('유효한 레벨 검증', () => {
@@ -117,21 +117,22 @@ describe('영어 문장 생성 API 로직', () => {
 
   describe('프롬프트 생성 로직', () => {
     test('초급 레벨 프롬프트 생성', () => {
-      const text = 'I like cats';
+      const word = 'cat';
       const level = '초급';
       
-      const expectedPrompt = `다음 텍스트를 기반으로 ${level} 수준의 영어 예문 3개를 만들어주세요.
+      const expectedPrompt = `다음 영어 단어를 사용한 ${level} 수준의 영어 예문 3개를 만들어주세요.
 
-텍스트: "${text}"
+단어: "${word}"
 
 요구사항:
 - ${level} 수준에 맞는 어휘와 문법 사용
-- 자연스럽고 실용적인 문장
+- 주어진 단어가 반드시 포함된 자연스럽고 실용적인 문장
 - 각 문장은 독립적이고 완전한 문장이어야 함
+- 단어의 다양한 용법을 보여주는 문장들
 
 형식: 번호 없이 문장만 작성하고, 각 문장은 새 줄로 구분`;
 
-      expect(expectedPrompt).toContain(text);
+      expect(expectedPrompt).toContain(word);
       expect(expectedPrompt).toContain(level);
       expect(expectedPrompt).toContain('3개를 만들어주세요');
     });

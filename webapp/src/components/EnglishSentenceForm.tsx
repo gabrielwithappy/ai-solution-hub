@@ -15,26 +15,26 @@ export interface EnglishSentenceFormProps {
 export type SentenceLevel = '초급' | '중급' | '고급';
 
 export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
-  const [text, setText] = useState('');
+  const [word, setWord] = useState('');
   const [level, setLevel] = useState<SentenceLevel>('초급');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const maxLength = 500;
-  const isTextValid = text.trim().length > 0 && text.length <= maxLength;
+  const maxLength = 50;
+  const isWordValid = word.trim().length > 0 && word.length <= maxLength;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     // 입력값 검증
-    if (!text.trim()) {
-      setError('텍스트를 입력해주세요.');
+    if (!word.trim()) {
+      setError('영어 단어를 입력해주세요.');
       return;
     }
 
-    if (text.length > maxLength) {
-      setError('500자를 초과할 수 없습니다.');
+    if (word.length > maxLength) {
+      setError('50자를 초과할 수 없습니다.');
       return;
     }
 
@@ -45,7 +45,7 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text: text.trim(),
+          word: word.trim(),
           level
         })
       });
@@ -65,13 +65,13 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
     }
   };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newText = e.target.value;
-    setText(newText);
+  const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newWord = e.target.value;
+    setWord(newWord);
     
     // 실시간 글자수 검증
-    if (newText.length > maxLength) {
-      setError('500자를 초과할 수 없습니다.');
+    if (newWord.length > maxLength) {
+      setError('50자를 초과할 수 없습니다.');
     } else {
       setError('');
     }
@@ -79,25 +79,25 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* 영어 문장 입력 */}
+      {/* 영어 단어 입력 */}
       <div className="space-y-2">
-        <label htmlFor="english-text" className="block text-sm font-medium text-gray-700">
-          영어 문장 입력
+        <label htmlFor="english-word" className="block text-sm font-medium text-gray-700">
+          영어 단어 입력
         </label>
-        <textarea
-          id="english-text"
-          value={text}
-          onChange={handleTextChange}
-          placeholder="영어 문장을 입력하세요. 예: I love programming"
+        <input
+          type="text"
+          id="english-word"
+          value={word}
+          onChange={handleWordChange}
+          placeholder="영어 단어를 입력하세요. 예: cat, study, happy"
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          rows={4}
           disabled={isLoading}
         />
         
         {/* 글자 수 카운터 */}
         <div className="flex justify-between items-center text-sm">
-          <span className={`${text.length > maxLength ? 'text-red-500' : 'text-gray-500'}`}>
-            {text.length} / {maxLength}
+          <span className={`${word.length > maxLength ? 'text-red-500' : 'text-gray-500'}`}>
+            {word.length} / {maxLength}
           </span>
         </div>
       </div>
@@ -130,7 +130,7 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
       {/* 제출 버튼 */}
       <Button
         type="submit"
-        disabled={isLoading || text.length > maxLength}
+        disabled={isLoading || word.length > maxLength}
         className="w-full"
       >
         {isLoading ? '생성 중...' : '문장 생성'}

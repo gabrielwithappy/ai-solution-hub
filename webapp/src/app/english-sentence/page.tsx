@@ -37,7 +37,7 @@ export default function EnglishSentencePage() {
           영어 문장 생성
         </h1>
         <p className="text-gray-600">
-          영어 문장을 입력하면 AI가 난이도별로 다양한 예시 문장을 생성해드립니다.
+          영어 단어를 입력하면 AI가 그 단어를 활용한 난이도별 예시 문장을 생성해드립니다.
         </p>
       </div>
 
@@ -46,7 +46,7 @@ export default function EnglishSentencePage() {
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              문장 입력
+              단어 입력
             </h2>
             <EnglishSentenceForm onResult={handleResult} />
           </div>
@@ -57,9 +57,9 @@ export default function EnglishSentencePage() {
               💡 사용 예시
             </h3>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• I love programming</li>
-              <li>• She is reading a book</li>
-              <li>• We went to the park yesterday</li>
+              <li>• cat (고양이)</li>
+              <li>• study (공부하다)</li>
+              <li>• beautiful (아름다운)</li>
             </ul>
           </div>
         </div>
@@ -99,11 +99,11 @@ export default function EnglishSentencePage() {
               <div className="text-center">
                 <div className="text-gray-400 text-4xl mb-4">📝</div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  문장을 입력해주세요
+                  단어를 입력해주세요
                 </h3>
                 <p className="text-gray-600">
-                  좌측 폼에 영어 문장을 입력하고 난이도를 선택하면<br />
-                  AI가 다양한 예시 문장을 생성해드립니다.
+                  좌측 폼에 영어 단어를 입력하고 난이도를 선택하면<br />
+                  AI가 그 단어를 활용한 다양한 예시 문장을 생성해드립니다.
                 </p>
               </div>
             </div>
@@ -118,15 +118,15 @@ export default function EnglishSentencePage() {
         </h3>
         <div className="grid gap-4 md:grid-cols-3">
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">난이도별 생성</h4>
+            <h4 className="font-medium text-gray-900 mb-2">단어 기반 생성</h4>
             <p className="text-sm text-gray-600">
-              초급, 중급, 고급 수준에 맞는 어휘와 문법을 사용한 문장을 생성합니다.
+              입력한 단어를 포함한 자연스럽고 실용적인 예시 문장을 생성합니다.
             </p>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">실용적 예문</h4>
+            <h4 className="font-medium text-gray-900 mb-2">난이도별 제공</h4>
             <p className="text-sm text-gray-600">
-              실제 대화나 글쓰기에서 사용할 수 있는 자연스러운 문장을 제공합니다.
+              초급, 중급, 고급 수준에 맞는 어휘와 문법을 사용한 문장을 제공합니다.
             </p>
           </div>
           <div>

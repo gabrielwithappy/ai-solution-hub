@@ -2,8 +2,8 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col items-center justify-center h-[60vh] text-center">
-      <section className="max-w-2xl">
+    <main className="flex flex-col items-center justify-start py-8 text-center">
+      <section className="max-w-4xl">
         <h2 className="text-2xl font-bold mb-4">AI 기반 콘텐츠 생성 허브</h2>
         <p className="mb-8 text-gray-600">AI를 활용해 다양한 콘텐츠를 쉽고 빠르게 생성하세요.</p>
         

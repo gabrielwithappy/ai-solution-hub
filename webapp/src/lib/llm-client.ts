@@ -26,6 +26,45 @@ export interface LLMResponse {
   };
 }
 
+// API 응답 타입 정의
+interface OpenAIResponse {
+  choices: Array<{
+    message: {
+      content: string;
+    };
+  }>;
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
+}
+
+interface GeminiResponse {
+  candidates: Array<{
+    content: {
+      parts: Array<{
+        text: string;
+      }>;
+    };
+  }>;
+  usageMetadata?: {
+    promptTokenCount?: number;
+    candidatesTokenCount?: number;
+    totalTokenCount?: number;
+  };
+}
+
+interface ClaudeResponse {
+  content: Array<{
+    text: string;
+  }>;
+  usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+  };
+}
+
 /**
  * OpenAI API 호출 함수
  */
@@ -48,7 +87,7 @@ async function callOpenAI(config: LLMConfig, request: LLMRequest): Promise<LLMRe
     throw new Error(`OpenAI API 오류: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json();
+  const data: OpenAIResponse = await response.json();
   
   return {
     content: data.choices[0]?.message?.content || '',
@@ -85,7 +124,7 @@ async function callGemini(config: LLMConfig, request: LLMRequest): Promise<LLMRe
     throw new Error(`Gemini API 오류: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json();
+  const data: GeminiResponse = await response.json();
   
   return {
     content: data.candidates[0]?.content?.parts[0]?.text || '',
@@ -121,7 +160,7 @@ async function callClaude(config: LLMConfig, request: LLMRequest): Promise<LLMRe
     throw new Error(`Claude API 오류: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json();
+  const data: ClaudeResponse = await response.json();
   
   return {
     content: data.content[0]?.text || '',

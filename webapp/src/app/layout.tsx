@@ -27,7 +27,9 @@ export default function RootLayout({
     <html lang="ko">
       <body className="bg-gray-50 min-h-screen">
         <header className="bg-white shadow p-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-blue-700">AI Solution Hub</h1>
+          <Link href="/" className="text-xl font-bold text-blue-700 hover:text-blue-800 transition-colors">
+            AI Solution Hub
+          </Link>
           <nav className="flex gap-4">
             <Link href="/english-sentence" className="hover:underline">영어 문장 생성</Link>
             <Link href="/celebration-message" className="hover:underline">축하 문구 생성</Link>

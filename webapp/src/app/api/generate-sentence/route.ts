@@ -7,13 +7,77 @@ import { NextRequest, NextResponse } from 'next/server';
 import { callLLM } from '@/lib/llm-client';
 import { validateLLMConfig } from '@/lib/llm-config';
 
+/**
+ * 문장의 단어 순서를 섞는 함수
+ */
+function scrambleSentence(sentence: string): string {
+  const words = sentence.split(/(\s+|[.,!?;:])/); // 구두점 보존하며 분리
+  const wordIndices: number[] = [];
+  
+  // 실제 단어(구두점이 아닌)의 인덱스만 수집
+  words.forEach((word, index) => {
+    if (word.trim() && !word.match(/^[.,!?;:\s]+$/)) {
+      wordIndices.push(index);
+    }
+  });
+  
+  // 단어 인덱스를 섞기
+  const shuffledIndices = [...wordIndices];
+  for (let i = shuffledIndices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledIndices[i], shuffledIndices[j]] = [shuffledIndices[j], shuffledIndices[i]];
+  }
+  
+  // 섞인 순서로 단어 재배치
+  const result = [...words];
+  wordIndices.forEach((originalIndex, i) => {
+    result[originalIndex] = words[shuffledIndices[i]];
+  });
+  
+  return result.join('');
+}
+
+/**
+ * LLM 응답을 파싱하여 예시 문장들을 추출
+ */
+function parseExamples(content: string): Omit<SentenceExample, 'scrambledSentence'>[] {
+  const examples: Omit<SentenceExample, 'scrambledSentence'>[] = [];
+  const sections = content.split(/의미\d+:/);
+  
+  sections.forEach(section => {
+    if (!section.trim()) return;
+    
+    const lines = section.trim().split('\n').filter(line => line.trim());
+    if (lines.length >= 3) {
+      const meaning = lines[0].trim();
+      const originalSentence = lines[1].trim();
+      const koreanTranslation = lines[2].trim();
+      
+      examples.push({
+        meaning,
+        originalSentence,
+        koreanTranslation
+      });
+    }
+  });
+  
+  return examples;
+}
+
 export interface GenerateSentenceRequest {
   word: string;
   level: '초급' | '중급' | '고급';
 }
 
+export interface SentenceExample {
+  meaning: string;           // 단어의 의미/뜻
+  originalSentence: string;  // 완성된 영어 문장
+  scrambledSentence: string; // 단어 순서가 섞인 문장
+  koreanTranslation: string; // 한국어 해석
+}
+
 export interface GenerateSentenceResponse {
-  sentences: string[];
+  examples: SentenceExample[];
   provider?: string;  // 어떤 LLM을 사용했는지 반환
 }
 
@@ -58,39 +122,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 🤖 LLM 프롬프트 생성
-    const prompt = `다음 영어 단어를 사용한 ${body.level} 수준의 영어 예문 3개를 만들어주세요.
+    // 🤖 다의어 처리를 위한 새로운 프롬프트
+    const prompt = `다음 영어 단어 "${body.word}"의 서로 다른 의미들을 찾아서, 각 의미마다 ${body.level} 수준의 영어 예문과 한국어 해석을 제공해주세요.
 
 단어: "${body.word}"
+난이도: ${body.level}
 
 요구사항:
+- 단어가 가진 주요 의미들을 모두 포함 (최대 5개)
+- 각 의미마다 자연스럽고 실용적인 예문 1개씩
 - ${body.level} 수준에 맞는 어휘와 문법 사용
-- 주어진 단어가 반드시 포함된 자연스럽고 실용적인 문장
-- 각 문장은 독립적이고 완전한 문장이어야 함
-- 단어의 다양한 용법을 보여주는 문장들
+- 한국어 해석은 자연스럽고 정확하게
 
-형식: 번호 없이 문장만 작성하고, 각 문장은 새 줄로 구분`;
+출력 형식:
+의미1: [단어의 첫 번째 의미 설명]
+[영어 예문]
+[한국어 해석]
+
+의미2: [단어의 두 번째 의미 설명]
+[영어 예문]
+[한국어 해석]
+
+(단어에 의미가 더 있다면 의미3, 의미4 등으로 계속...)`;
 
     // 🔄 동적 LLM 호출 (primary + fallback 자동 처리)
     const llmResponse = await callLLM({
       prompt,
-      maxTokens: 1000,
+      maxTokens: 1500,
       temperature: 0.7
     });
 
-    // 응답 파싱
-    const sentences = llmResponse.content
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0 && !line.match(/^\d+\./)) // 번호 제거
-      .slice(0, 3); // 최대 3개
+    // 응답 파싱 및 scrambled 문장 생성
+    const parsedExamples = parseExamples(llmResponse.content);
+    const examples: SentenceExample[] = parsedExamples.map(example => ({
+      ...example,
+      scrambledSentence: scrambleSentence(example.originalSentence)
+    }));
 
     const response: GenerateSentenceResponse = {
-      sentences,
+      examples,
       provider: llmResponse.provider  // 🏷️ 사용된 LLM provider 정보 포함
     };
 
-    console.log(`✅ 영어 문장 생성 완료 - Provider: ${llmResponse.provider}, 문장 수: ${sentences.length}`);
+    console.log(`✅ 영어 문장 생성 완료 - Provider: ${llmResponse.provider}, 예시 수: ${examples.length}`);
     
     return NextResponse.json(response);
 

@@ -30,30 +30,58 @@ describe('영어 문장 생성 API 로직', () => {
     });
   });
 
-  describe('영어 문장 생성 비즈니스 로직', () => {
-    test('유효한 입력으로 문장 생성 성공', async () => {
-      // Given: Mock LLM 응답
+  describe('영어 문장 생성 비즈니스 로직 (확장)', () => {
+    test('다의어 처리: 여러 의미를 가진 단어에 대해 의미별 예문을 생성한다', async () => {
+      // Given: Mock LLM 응답 (다의어)
       mockCallLLM.mockResolvedValue({
-        content: 'I enjoy coding every day.\nProgramming brings me joy.\nI find programming fascinating.',
+        content: `의미1: 은행 (금융기관)
+I went to the bank to deposit money.
+은행에 돈을 예금하러 갔습니다.
+
+의미2: 강둑, 제방  
+The river bank was covered with flowers.
+강둑이 꽃으로 덮여 있었습니다.`,
         provider: 'openai',
-        usage: { totalTokens: 50 }
+        usage: { totalTokens: 80 }
       });
 
       // When: LLM 호출
       const result = await callLLM({
-        prompt: '테스트 프롬프트',
-        maxTokens: 1000,
+        prompt: '다의어 테스트 프롬프트',
+        maxTokens: 1500,
+        temperature: 0.7
+      });
+
+      // Then: 다의어 응답 검증
+      expect(result.content).toContain('의미1:');
+      expect(result.content).toContain('의미2:');
+      expect(result.content).toContain('은행에 돈을');
+      expect(result.content).toContain('강둑이 꽃으로');
+      expect(result.provider).toBe('openai');
+    });
+
+    test('단일 의미 단어도 올바르게 처리한다', async () => {
+      // Given: Mock LLM 응답 (단일 의미)
+      mockCallLLM.mockResolvedValue({
+        content: `의미1: 고양이
+The cat is sleeping on the sofa.
+고양이가 소파에서 자고 있습니다.`,
+        provider: 'openai',
+        usage: { totalTokens: 30 }
+      });
+
+      // When: LLM 호출
+      const result = await callLLM({
+        prompt: '단일 의미 테스트 프롬프트',
+        maxTokens: 1500,
         temperature: 0.7
       });
 
       // Then: 결과 검증
-      expect(result.content).toContain('I enjoy coding every day.');
+      expect(result.content).toContain('의미1: 고양이');
+      expect(result.content).toContain('The cat is sleeping');
+      expect(result.content).toContain('고양이가 소파에서');
       expect(result.provider).toBe('openai');
-      expect(mockCallLLM).toHaveBeenCalledWith({
-        prompt: '테스트 프롬프트',
-        maxTokens: 1000,
-        temperature: 0.7
-      });
     });
 
     test('LLM 설정 검증 성공', () => {
@@ -116,25 +144,34 @@ describe('영어 문장 생성 API 로직', () => {
   });
 
   describe('프롬프트 생성 로직', () => {
-    test('초급 레벨 프롬프트 생성', () => {
-      const word = 'cat';
-      const level = '초급';
+    test('다의어 프롬프트 생성', () => {
+      const word = 'bank';
+      const level = '중급';
       
-      const expectedPrompt = `다음 영어 단어를 사용한 ${level} 수준의 영어 예문 3개를 만들어주세요.
+      const expectedPrompt = `다음 영어 단어 "${word}"의 서로 다른 의미들을 찾아서, 각 의미마다 ${level} 수준의 영어 예문과 한국어 해석을 제공해주세요.
 
 단어: "${word}"
+난이도: ${level}
 
 요구사항:
+- 단어가 가진 주요 의미들을 모두 포함 (최대 5개)
+- 각 의미마다 자연스럽고 실용적인 예문 1개씩
 - ${level} 수준에 맞는 어휘와 문법 사용
-- 주어진 단어가 반드시 포함된 자연스럽고 실용적인 문장
-- 각 문장은 독립적이고 완전한 문장이어야 함
-- 단어의 다양한 용법을 보여주는 문장들
+- 한국어 해석은 자연스럽고 정확하게
 
-형식: 번호 없이 문장만 작성하고, 각 문장은 새 줄로 구분`;
+출력 형식:
+의미1: [단어의 첫 번째 의미 설명]
+[영어 예문]
+[한국어 해석]
+
+의미2: [단어의 두 번째 의미 설명]
+[영어 예문]
+[한국어 해석]`;
 
       expect(expectedPrompt).toContain(word);
       expect(expectedPrompt).toContain(level);
-      expect(expectedPrompt).toContain('3개를 만들어주세요');
+      expect(expectedPrompt).toContain('서로 다른 의미들을');
+      expect(expectedPrompt).toContain('한국어 해석');
     });
   });
 });

@@ -58,7 +58,14 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        sentences: ['I have a cat.', 'The cat is sleeping.', 'My cat likes fish.'],
+        examples: [
+          {
+            meaning: '고양이',
+            originalSentence: 'I have a cat.',
+            scrambledSentence: 'have I a cat.',
+            koreanTranslation: '나는 고양이를 기르고 있습니다.'
+          }
+        ],
         provider: 'openai'
       })
     } as Response);
@@ -88,7 +95,14 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     // Then: 결과 콜백 호출 확인
     await waitFor(() => {
       expect(mockOnResult).toHaveBeenCalledWith({
-        sentences: ['I have a cat.', 'The cat is sleeping.', 'My cat likes fish.'],
+        examples: [
+          {
+            meaning: '고양이',
+            originalSentence: 'I have a cat.',
+            scrambledSentence: 'have I a cat.',
+            koreanTranslation: '나는 고양이를 기르고 있습니다.'
+          }
+        ],
         provider: 'openai'
       });
     });
@@ -136,7 +150,15 @@ describe('EnglishSentenceForm 컴포넌트', () => {
     mockFetch.mockImplementationOnce(() => 
       new Promise(resolve => setTimeout(() => resolve({
         ok: true,
-        json: async () => ({ sentences: ['Test'], provider: 'openai' })
+        json: async () => ({ 
+          examples: [{ 
+            meaning: 'test', 
+            originalSentence: 'Test sentence', 
+            scrambledSentence: 'sentence Test',
+            koreanTranslation: '테스트 문장'
+          }], 
+          provider: 'openai' 
+        })
       } as Response), 100))
     );
 

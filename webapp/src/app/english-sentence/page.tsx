@@ -6,12 +6,12 @@
 'use client';
 
 import { useState } from 'react';
-import { EnglishSentenceForm } from '@/components/EnglishSentenceForm';
-import ResultDisplay from '@/components/ResultDisplay';
+import { EnglishSentenceForm, SentenceExample } from '@/components/EnglishSentenceForm';
+import { SentenceExampleCard } from '@/components/SentenceExampleCard';
 import LoadingIndicator from '@/components/ui/LoadingIndicator';
 
 interface GeneratedResult {
-  sentences: string[];
+  examples: SentenceExample[];
   provider?: string;
 }
 
@@ -77,9 +77,9 @@ export default function EnglishSentencePage() {
 
           {result && !isLoading && (
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  생성된 예시 문장
+                  생성된 예시 문장들
                 </h2>
                 {result.provider && (
                   <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
@@ -88,9 +88,15 @@ export default function EnglishSentencePage() {
                 )}
               </div>
               
-              <ResultDisplay 
-                results={result.sentences}
-              />
+              <div className="space-y-4">
+                {result.examples.map((example, index) => (
+                  <SentenceExampleCard
+                    key={index}
+                    example={example}
+                    index={index}
+                  />
+                ))}
+              </div>
             </div>
           )}
 

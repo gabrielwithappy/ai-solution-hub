@@ -9,7 +9,14 @@ import { useState } from 'react';
 import Button from './ui/Button';
 
 export interface EnglishSentenceFormProps {
-  onResult: (result: { sentences: string[]; provider?: string }) => void;
+  onResult: (result: { examples: SentenceExample[]; provider?: string }) => void;
+}
+
+export interface SentenceExample {
+  meaning: string;
+  originalSentence: string;
+  scrambledSentence: string;
+  koreanTranslation: string;
 }
 
 export type SentenceLevel = '초급' | '중급' | '고급';

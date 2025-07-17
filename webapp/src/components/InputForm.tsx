@@ -20,8 +20,9 @@ export default function InputForm({ label, placeholder, onSubmit, isLoading = fa
         if (value.trim()) onSubmit(value);
       }}
     >
-      <label className="font-semibold">{label}</label>
+      <label htmlFor="input-textarea" className="font-semibold">{label}</label>
       <textarea
+        id="input-textarea"
         className="border rounded p-2 resize-none"
         placeholder={placeholder}
         value={value}

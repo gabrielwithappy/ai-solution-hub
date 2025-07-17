@@ -84,4 +84,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
+### Vercel 배포 설정
+
+1. **GitHub 연동**: GitHub 리포지토리를 Vercel에 연결합니다.
+
+2. **환경 변수 설정**: Vercel 대시보드에서 다음 환경 변수들을 설정합니다:
+   ```
+   OPENAI_API_KEY=your_openai_api_key_here
+   OPENAI_API_URL=https://api.openai.com/v1/chat/completions
+   OPENAI_MODEL=gpt-3.5-turbo
+   NODE_ENV=production
+   ```
+
+3. **빌드 설정**: 
+   - Build Command: `npm run build`
+   - Output Directory: `.next`
+   - Install Command: `npm install`
+
+4. **배포**: 설정 완료 후 Deploy 버튼을 클릭하여 배포합니다.
+
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

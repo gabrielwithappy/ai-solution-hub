@@ -4,6 +4,7 @@
 
 import { 
   LLMProvider, 
+  LLMConfig,
   getLLMConfig, 
   getPrimaryProvider, 
   getFallbackProvider 
@@ -28,7 +29,7 @@ export interface LLMResponse {
 /**
  * OpenAI API 호출 함수
  */
-async function callOpenAI(config: any, request: LLMRequest): Promise<LLMResponse> {
+async function callOpenAI(config: LLMConfig, request: LLMRequest): Promise<LLMResponse> {
   const response = await fetch(config.apiUrl, {
     method: 'POST',
     headers: {
@@ -63,7 +64,7 @@ async function callOpenAI(config: any, request: LLMRequest): Promise<LLMResponse
 /**
  * Gemini API 호출 함수
  */
-async function callGemini(config: any, request: LLMRequest): Promise<LLMResponse> {
+async function callGemini(config: LLMConfig, request: LLMRequest): Promise<LLMResponse> {
   const response = await fetch(`${config.apiUrl}?key=${config.apiKey}`, {
     method: 'POST',
     headers: {
@@ -100,7 +101,7 @@ async function callGemini(config: any, request: LLMRequest): Promise<LLMResponse
 /**
  * Claude API 호출 함수
  */
-async function callClaude(config: any, request: LLMRequest): Promise<LLMResponse> {
+async function callClaude(config: LLMConfig, request: LLMRequest): Promise<LLMResponse> {
   const response = await fetch(config.apiUrl, {
     method: 'POST',
     headers: {
@@ -183,7 +184,7 @@ export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
  */
 async function callLLMWithProvider(
   provider: LLMProvider, 
-  config: any, 
+  config: LLMConfig, 
   request: LLMRequest
 ): Promise<LLMResponse> {
   switch (provider) {

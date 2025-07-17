@@ -2,7 +2,7 @@
  * SentenceExampleCard 컴포넌트 테스트
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SentenceExampleCard } from './SentenceExampleCard';
 
@@ -110,7 +110,7 @@ describe('SentenceExampleCard 컴포넌트', () => {
   test('복사 실패 시 에러가 로깅된다', async () => {
     const user = userEvent.setup();
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const mockWriteText = jest.spyOn(navigator.clipboard, 'writeText')
+    jest.spyOn(navigator.clipboard, 'writeText')
       .mockRejectedValue(new Error('클립보드 오류'));
     
     // When: 컴포넌트 렌더링 및 정답 확인

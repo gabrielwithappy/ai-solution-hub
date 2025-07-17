@@ -28,7 +28,6 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
   const [error, setError] = useState('');
 
   const maxLength = 50;
-  const isWordValid = word.trim().length > 0 && word.length <= maxLength;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -87,7 +87,7 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* 영어 단어 입력 */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         <label htmlFor="english-word" className="block text-sm font-medium text-gray-700">
           영어 단어 입력
         </label>
@@ -97,7 +97,7 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
           value={word}
           onChange={handleWordChange}
           placeholder="영어 단어를 입력하세요. 예: cat, study, happy"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 text-lg border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           disabled={isLoading}
         />
         
@@ -110,7 +110,7 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
       </div>
 
       {/* 난이도 선택 */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         <label htmlFor="level-select" className="block text-sm font-medium text-gray-700">
           난이도 선택
         </label>
@@ -118,7 +118,7 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
           id="level-select"
           value={level}
           onChange={(e) => setLevel(e.target.value as SentenceLevel)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 text-lg border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           disabled={isLoading}
         >
           <option value="초급">초급</option>
@@ -138,7 +138,7 @@ export function EnglishSentenceForm({ onResult }: EnglishSentenceFormProps) {
       <Button
         type="submit"
         disabled={isLoading || word.length > maxLength}
-        className="w-full"
+        className="w-full text-lg py-3"
       >
         {isLoading ? '생성 중...' : '문장 생성'}
       </Button>

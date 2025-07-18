@@ -25,21 +25,24 @@ describe('SentenceExampleCard 컴포넌트', () => {
     jest.clearAllMocks();
   });
 
-  test('초기 상태: scrambled 문장과 정답 확인 버튼이 표시된다', () => {
+  test('초기 상태: scrambled 문장, 한국어 힌트, 정답 확인 버튼이 표시된다', () => {
     // When: 컴포넌트 렌더링
     render(<SentenceExampleCard example={mockExample} index={0} />);
 
     // Then: 기본 요소들이 표시된다
     expect(screen.getByText('의미 1: 고양이')).toBeInTheDocument();
-    expect(screen.getByText('have I a cat.')).toBeInTheDocument();
+    // 스크램블 문장이 "/" 구분자로 표시되는지 확인
+    expect(screen.getByText('have / I / a / cat.')).toBeInTheDocument();
+    // 한국어 힌트가 표시되는지 확인 (이모지 제외하고 검색)
+    expect(screen.getByText(/한국어 힌트/)).toBeInTheDocument();
+    expect(screen.getByText('나는 고양이를 기르고 있습니다.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /정답 확인하기/i })).toBeInTheDocument();
     
-    // 정답은 아직 숨겨져 있어야 함
+    // 정답 영어 문장은 아직 숨겨져 있어야 함
     expect(screen.queryByText('I have a cat.')).not.toBeInTheDocument();
-    expect(screen.queryByText('나는 고양이를 기르고 있습니다.')).not.toBeInTheDocument();
   });
 
-  test('정답 확인 버튼 클릭 시 원문과 해석이 표시된다', async () => {
+  test('정답 확인 버튼 클릭 시 정답 영어 문장이 표시된다', async () => {
     const user = userEvent.setup();
     
     // When: 컴포넌트 렌더링
@@ -50,16 +53,17 @@ describe('SentenceExampleCard 컴포넌트', () => {
     // When: 정답 확인 버튼 클릭
     await user.click(showAnswerButton);
 
-    // Then: 정답이 표시된다
+    // Then: 정답 영어 문장이 표시된다
     expect(screen.getByText('I have a cat.')).toBeInTheDocument();
-    expect(screen.getByText('나는 고양이를 기르고 있습니다.')).toBeInTheDocument();
+    // 정답 해석 섹션도 표시되는지 확인 (이모지 제외하고 검색)
+    expect(screen.getByText(/정답 해석/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /정답 숨기기/i })).toBeInTheDocument();
     
     // 정답 확인 버튼은 사라져야 함
     expect(screen.queryByRole('button', { name: /정답 확인하기/i })).not.toBeInTheDocument();
   });
 
-  test('정답 숨기기 버튼 클릭 시 정답이 다시 숨겨진다', async () => {
+  test('정답 숨기기 버튼 클릭 시 정답 영어 문장이 다시 숨겨진다', async () => {
     const user = userEvent.setup();
     
     // When: 컴포넌트 렌더링
@@ -69,9 +73,10 @@ describe('SentenceExampleCard 컴포넌트', () => {
     await user.click(screen.getByRole('button', { name: /정답 확인하기/i }));
     await user.click(screen.getByRole('button', { name: /정답 숨기기/i }));
 
-    // Then: 정답이 다시 숨겨진다
+    // Then: 정답 영어 문장만 다시 숨겨진다
     expect(screen.queryByText('I have a cat.')).not.toBeInTheDocument();
-    expect(screen.queryByText('나는 고양이를 기르고 있습니다.')).not.toBeInTheDocument();
+    // 한국어 힌트는 여전히 표시되어야 함 (기본으로 보이므로)
+    expect(screen.getByText('나는 고양이를 기르고 있습니다.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /정답 확인하기/i })).toBeInTheDocument();
   });
 

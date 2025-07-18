@@ -67,14 +67,27 @@ export function SentenceExampleCard({ example, index }: SentenceExampleCardProps
         </span>
       </div>
 
-      {/* Scrambled 문장 (항상 표시) */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-        <h4 className="text-sm font-medium text-yellow-800 mb-3">
-          🧩 단어를 올바른 순서로 배열해보세요
-        </h4>
-        <p className="text-xl text-yellow-900 font-mono leading-relaxed">
-          {example.scrambledSentence}
-        </p>
+      {/* Scrambled 문장 및 한국어 해석 (항상 표시) */}
+      <div className="space-y-4">
+        {/* 스크램블된 문장 */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <h4 className="text-sm font-medium text-yellow-800 mb-3">
+            🧩 단어를 올바른 순서로 배열해보세요
+          </h4>
+          <p className="text-xl text-yellow-900 font-mono leading-relaxed">
+            {example.scrambledSentence.replace(/\s+/g, ' / ')}
+          </p>
+        </div>
+
+        {/* 한국어 해석 (힌트) */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h4 className="text-sm font-medium text-blue-800 mb-3">
+            💡 한국어 힌트
+          </h4>
+          <p className="text-lg text-blue-900 leading-relaxed">
+            {example.koreanTranslation}
+          </p>
+        </div>
       </div>
 
       {/* 정답 공개 버튼 */}
@@ -124,11 +137,11 @@ export function SentenceExampleCard({ example, index }: SentenceExampleCardProps
             </p>
           </div>
 
-          {/* 한국어 해석 */}
+          {/* 한국어 해석 (정답과 함께) */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-sm font-medium text-blue-800">
-                🇰🇷 한국어 해석
+                ✅ 정답 해석
               </h4>
               <button
                 onClick={() => handleCopy(example.koreanTranslation)}

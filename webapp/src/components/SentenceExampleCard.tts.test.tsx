@@ -36,6 +36,7 @@ const mockExample: SentenceExample = {
 };
 
 describe('SentenceExampleCard TTS 기능', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const mockTTSUtility = require('../lib/tts').ttsUtility;
 
   beforeEach(() => {

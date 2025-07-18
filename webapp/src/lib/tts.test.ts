@@ -1,4 +1,4 @@
-import { TTSUtility, createTTSUtility, TTSOptions, TTSState } from './tts';
+import { TTSUtility, createTTSUtility, TTSOptions } from './tts';
 
 // Web Speech API 모킹
 const mockSpeechSynthesis = {
@@ -14,6 +14,7 @@ const mockSpeechSynthesis = {
   removeEventListener: jest.fn(),
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockSpeechSynthesisUtterance = jest.fn().mockImplementation(function(this: any, text: string) {
   this.text = text;
   this.lang = 'en-US';
@@ -32,12 +33,16 @@ const mockSpeechSynthesisUtterance = jest.fn().mockImplementation(function(this:
 
 describe('TTS Utility', () => {
   let ttsUtility: TTSUtility;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let originalSpeechSynthesis: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let originalSpeechSynthesisUtterance: any;
 
   beforeAll(() => {
     // 원본 저장
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     originalSpeechSynthesis = (global as any).speechSynthesis;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     originalSpeechSynthesisUtterance = (global as any).SpeechSynthesisUtterance;
   });
 
@@ -71,7 +76,9 @@ describe('TTS Utility', () => {
 
   afterAll(() => {
     // 원본 복원
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).speechSynthesis = originalSpeechSynthesis;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).SpeechSynthesisUtterance = originalSpeechSynthesisUtterance;
   });
 

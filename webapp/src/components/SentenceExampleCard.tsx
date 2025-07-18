@@ -103,17 +103,19 @@ export function SentenceExampleCard({ example, index }: SentenceExampleCardProps
                     onClick={handleTTSPlay}
                     disabled={isTTSPlaying}
                     aria-label={`영어 문장 음성으로 듣기: ${example.originalSentence}`}
-                    className="text-xs text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 px-3 py-1 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1 text-sm font-medium text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 px-4 py-2 rounded-lg border border-green-300 hover:border-green-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
                   >
-                    {isTTSPlaying ? '🔊 재생 중...' : '🔊 음성 듣기'}
+                    <span className="text-base">{isTTSPlaying ? '🔊' : '🔊'}</span>
+                    <span>{isTTSPlaying ? '재생 중...' : '음성 듣기'}</span>
                   </button>
                 )}
                 {/* 복사 버튼 */}
                 <button
                   onClick={() => handleCopy(example.originalSentence)}
-                  className="text-xs text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 px-3 py-1 rounded-md transition-colors"
+                  className="flex items-center gap-1 text-sm font-medium text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 px-4 py-2 rounded-lg border border-green-300 hover:border-green-400 transition-all duration-200 shadow-sm hover:shadow-md"
                 >
-                  복사
+                  <span className="text-base">📋</span>
+                  <span>복사</span>
                 </button>
               </div>
             </div>
@@ -130,9 +132,10 @@ export function SentenceExampleCard({ example, index }: SentenceExampleCardProps
               </h4>
               <button
                 onClick={() => handleCopy(example.koreanTranslation)}
-                className="text-xs text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded-md transition-colors"
+                className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg border border-blue-300 hover:border-blue-400 transition-all duration-200 shadow-sm hover:shadow-md"
               >
-                복사
+                <span className="text-base">📋</span>
+                <span>복사</span>
               </button>
             </div>
             <p className="text-xl text-blue-900 leading-relaxed">

@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import Button from './ui/Button';
+import { ttsUtility } from '../lib/tts';
 
 export interface SentenceExample {
   meaning: string;
@@ -22,6 +23,10 @@ interface SentenceExampleCardProps {
 
 export function SentenceExampleCard({ example, index }: SentenceExampleCardProps) {
   const [showAnswer, setShowAnswer] = useState(false);
+  const [isTTSPlaying, setIsTTSPlaying] = useState(false);
+
+  // TTS 지원 여부 직접 확인 (useEffect로 한 번 확인하는 것보다 실시간 확인)
+  const isTTSSupported = ttsUtility.isSupported();
 
   const handleCopy = async (text: string) => {
     try {
@@ -29,6 +34,24 @@ export function SentenceExampleCard({ example, index }: SentenceExampleCardProps
       // TODO: 복사 완료 토스트 메시지 표시
     } catch (error) {
       console.error('복사 실패:', error);
+    }
+  };
+
+  const handleTTSPlay = async () => {
+    if (!isTTSSupported || isTTSPlaying) return;
+
+    try {
+      setIsTTSPlaying(true);
+      await ttsUtility.speak(example.originalSentence, {
+        lang: 'en-US',
+        rate: 0.9,
+        pitch: 1,
+        volume: 1,
+      });
+    } catch (error) {
+      console.error('TTS 재생 실패:', error);
+    } finally {
+      setIsTTSPlaying(false);
     }
   };
 
@@ -73,12 +96,26 @@ export function SentenceExampleCard({ example, index }: SentenceExampleCardProps
               <h4 className="text-sm font-medium text-green-800">
                 ✅ 정답 문장
               </h4>
-              <button
-                onClick={() => handleCopy(example.originalSentence)}
-                className="text-xs text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 px-3 py-1 rounded-md transition-colors"
-              >
-                복사
-              </button>
+              <div className="flex gap-2">
+                {/* TTS 버튼 */}
+                {isTTSSupported && (
+                  <button
+                    onClick={handleTTSPlay}
+                    disabled={isTTSPlaying}
+                    aria-label={`영어 문장 음성으로 듣기: ${example.originalSentence}`}
+                    className="text-xs text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 px-3 py-1 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isTTSPlaying ? '🔊 재생 중...' : '🔊 음성 듣기'}
+                  </button>
+                )}
+                {/* 복사 버튼 */}
+                <button
+                  onClick={() => handleCopy(example.originalSentence)}
+                  className="text-xs text-green-600 hover:text-green-800 bg-green-100 hover:bg-green-200 px-3 py-1 rounded-md transition-colors"
+                >
+                  복사
+                </button>
+              </div>
             </div>
             <p className="text-xl text-green-900 leading-relaxed">
               {example.originalSentence}

@@ -10,6 +10,7 @@
 - **상태 관리:** React `useState`, `useContext` (컴포넌트 지역 상태)
 - **스타일링:** Tailwind CSS 또는 CSS Modules
 - **API 통신:** Fetch API (클라이언트-서버), Axios (서버-외부 API)
+- **TTS:** Web Speech API (브라우저 네이티브)
 - **테스트 프레임워크:** Jest (단위/통합), React Testing Library (컴포넌트)
 - **배포 플랫폼:** Vercel
 
@@ -37,8 +38,11 @@
 ├── /components/
 │   ├── ui/                   # 재사용 가능한 기본 UI (Button, Card 등)
 │   ├── InputForm.tsx         # 공통 입력 폼
-│   └── ResultDisplay.tsx     # 결과 표시 영역
+│   ├── ResultDisplay.tsx     # 결과 표시 영역
+│   └── SentenceExampleCard.tsx # 문장 예시 카드 (TTS 버튼 포함)
 ├── /lib/                     # 유틸리티, 헬퍼 함수
+│   ├── llm-client.ts         # LLM API 클라이언트
+│   └── tts.ts                # TTS 유틸리티 함수
 ├── /styles/                  # 전역 스타일
 └── /__tests__/               # 테스트 코드
 
@@ -97,9 +101,52 @@
 - **`ResultDisplay.tsx`**:
   - `results` 배열을 props로 받아 리스트 또는 카드 형태로 렌더링.
   - 각 항목에 '클립보드 복사' 버튼 포함. `navigator.clipboard.writeText()` API 사용.
+- **`SentenceExampleCard.tsx`**:
+  - 영어 문장 예시를 카드 형태로 표시하는 컴포넌트.
+  - TTS 기능을 위한 '음성 듣기' 버튼 포함.
+  - 정답 확인/숨기기 토글 기능 제공.
+  - 스크램블 문장 기능 지원.
+
+### 5.3. TTS 관련 모듈
+- **`lib/tts.ts`**:
+  - Web Speech API를 활용한 TTS 유틸리티 함수 제공.
+  - 브라우저 호환성 확인, 음성 설정, 재생 제어 기능 포함.
+  - TypeScript 인터페이스로 TTS 설정 옵션 정의.
 
 ## 6. 데이터베이스 설계
 - 요구사항에 따라 별도의 데이터베이스를 사용하지 않으며, 모든 데이터 처리는 일회성으로 메모리에서만 이루어진다.
+
+### 6.1. TTS 관련 데이터 모델
+
+TTS 기능을 위한 TypeScript 인터페이스 정의:
+
+```typescript
+// TTS 설정 옵션
+interface TTSOptions {
+  lang?: string;          // 언어 설정 (기본값: 'en-US')
+  rate?: number;          // 말하기 속도 (0.1-10, 기본값: 1)
+  pitch?: number;         // 음성 높낮이 (0-2, 기본값: 1)
+  volume?: number;        // 음량 (0-1, 기본값: 1)
+}
+
+// TTS 상태 관리
+interface TTSState {
+  isPlaying: boolean;     // 재생 중 여부
+  isPaused: boolean;      // 일시정지 여부
+  isSupported: boolean;   // 브라우저 지원 여부
+  error: string | null;   // 오류 메시지
+}
+
+// TTS 유틸리티 함수 반환 타입
+interface TTSUtility {
+  speak: (text: string, options?: TTSOptions) => Promise<void>;
+  pause: () => void;
+  resume: () => void;
+  stop: () => void;
+  isSupported: () => boolean;
+  getVoices: () => SpeechSynthesisVoice[];
+}
+```
 
 ## 7. 환경변수 관리
 ### 7.1. 환경변수 구성
@@ -174,8 +221,13 @@ API_TIMEOUT=30000                                  # 타임아웃 (ms)
 - **단위 테스트:**
   - API 계층: Mock Service Worker(MSW) 또는 `node-mocks-http`를 사용하여 HTTP 요청/응답을 모킹하고, 프롬프트 생성 및 데이터 가공 로직을 테스트한다.
   - 컴포넌트: React Testing Library를 사용하여 props에 따른 렌더링 결과와 사용자 상호작용을 테스트한다.
+  - **TTS 모듈**: Web Speech API를 모킹하여 TTS 기능의 호출, 상태 관리, 오류 처리를 테스트한다.
 - **통합 테스트:**
   - 페이지 단위로 컴포넌트와 API 호출 로직을 연동하여 전체 기능 흐름을 테스트한다. API 호출은 모킹하여 외부 의존성을 제거한다.
+  - **TTS 통합 테스트**: 영어 문장 생성부터 TTS 재생까지의 전체 워크플로우를 테스트한다.
+- **브라우저 호환성 테스트:**
+  - 주요 브라우저(Chrome, Safari, Firefox)에서 Web Speech API 지원 여부를 확인한다.
+  - TTS 미지원 브라우저에서의 폴백 동작을 테스트한다.
 
 ## 10. 배포 전략
 

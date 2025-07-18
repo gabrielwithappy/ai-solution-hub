@@ -1,21 +1,49 @@
 @import "tailwindcss";
 
+/* 명시적 라이트 모드 설정 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f9fafb;
+  --foreground: #111827;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* 다크 모드 비활성화 - 항상 라이트 모드 유지 */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #f9fafb;
+    --foreground: #111827;
+    color-scheme: light;
+  }
+  
+  html {
+    color-scheme: light;
+    background-color: #f9fafb;
+  }
+  
+  body {
+    color: #111827;
+    background-color: #f9fafb;
+  }
+}
+
+/* 명시적 배경색 설정 */
+html {
+  color-scheme: light;
+  background-color: #f9fafb;
+}
+
+body {
+  color: #111827;
+  background-color: #f9fafb;
+  font-family: inherit;
+  min-height: 100vh;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  body {
+    background-color: #f9fafb;
+    color: #111827;
   }
 }
 

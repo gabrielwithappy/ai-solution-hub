@@ -127,8 +127,12 @@ ${difficultyInstructions[difficulty]}
 응답은 반드시 다음 JSON 형식으로만 제공해주세요:
 {
   "englishStory": "HTML 태그가 포함된 영어 이야기 내용",
-  "koreanTranslation": "한국어 번역"
+  "koreanTranslation": "HTML 태그가 제거된 순수한 한국어 번역 (HTML 태그 없이 일반 텍스트만)"
 }
+
+**주의사항**: 
+- englishStory는 HTML 태그로 강조된 영어 텍스트
+- koreanTranslation은 HTML 태그가 전혀 포함되지 않은 순수한 한국어 번역
 
 다른 설명이나 추가 텍스트 없이 오직 JSON만 응답해주세요.`.trim();
 }
@@ -208,9 +212,12 @@ export function parseApiResponse(
         // 경고는 하지만 에러로 처리하지는 않음 (LLM이 유사한 형태로 사용했을 수 있음)
     }
 
+    // 한국어 번역에서 HTML 태그 제거 (안전장치)
+    const cleanKoreanTranslation = koreanTranslation.replace(/<[^>]*>/g, '').trim();
+
     return {
         englishStory: englishStory.trim(),
-        koreanTranslation: koreanTranslation.trim(),
+        koreanTranslation: cleanKoreanTranslation,
         usedWords: originalWords,
         difficulty
     };

@@ -5,7 +5,7 @@ import { POST } from './route';
 import { NextRequest } from 'next/server';
 
 // 테스트용 Request 객체 생성 함수
-function createRequest(data: any) {
+function createRequest(data: Record<string, unknown>) {
     return new NextRequest('http://localhost:3000/api/generate-story', {
         method: 'POST',
         headers: {

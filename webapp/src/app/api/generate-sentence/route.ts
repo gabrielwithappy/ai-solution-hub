@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { callLLM } from '@/lib/llm-client';
-import { validateLLMConfig } from '@/lib/llm-config';
+import { validateLLMConfig, getAvailableProviders, getPrimaryProvider } from '@/lib/llm-config';
 
 /**
  * 문장의 단어 순서를 섞는 함수

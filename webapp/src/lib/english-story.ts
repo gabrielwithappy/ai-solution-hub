@@ -148,11 +148,11 @@ ${difficultyInstructions[difficulty]}
  * @returns 파싱된 스토리 응답
  */
 export function parseApiResponse(
-    response: any,
+    response: string | Record<string, unknown>,
     originalWords: WordMeaning[],
     difficulty: StoryDifficulty
 ): StoryResponse {
-    let parsedResponse: any;
+    let parsedResponse: Record<string, unknown>;
 
     // LLM 응답에서 JSON 추출 시도
     if (typeof response === 'string') {

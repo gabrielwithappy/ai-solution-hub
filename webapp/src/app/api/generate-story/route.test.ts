@@ -108,7 +108,7 @@ describe('/api/generate-story', () => {
         const data = await response.json();
 
         expect(response.status).toBe(400);
-        expect(data.error).toBe('유효하지 않은 난이도입니다.');
+        expect(data.error).toBe('난이도는 easy, medium, hard 중 하나여야 합니다.');
     });
 
     test('잘못된 JSON 형식의 요청에 대해 적절히 처리해야 한다', async () => {

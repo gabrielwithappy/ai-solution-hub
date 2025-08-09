@@ -24,6 +24,13 @@ export interface StoryResponse {
 }
 
 /**
+ * LLM API 호출 결과를 포함한 스토리 응답 타입
+ */
+export interface StoryResult extends StoryResponse {
+    provider: string;
+}
+
+/**
  * API 요청 타입
  */
 export interface StoryGenerationRequest {

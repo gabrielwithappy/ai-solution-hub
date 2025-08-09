@@ -6,15 +6,24 @@ export default function HomePage() {
       <section className="max-w-4xl px-4">
         <h2 className="text-2xl font-bold mb-4 text-gray-900">AI 기반 콘텐츠 생성 허브</h2>
         <p className="mb-8 text-gray-600">AI를 활용해 다양한 콘텐츠를 쉽고 빠르게 생성하세요.</p>
-        
+
         {/* 기능 카드 */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <Link href="/english-sentence" 
-                className="block p-6 bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Link href="/english-sentence"
+            className="block p-6 bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow">
             <div className="text-2xl mb-3">📝</div>
             <h3 className="text-lg font-semibold mb-2 text-gray-900">영어 문장 생성</h3>
             <p className="text-gray-600 text-sm">
               영어 단어를 입력하면 난이도별로 다양한 예시 문장을 생성합니다.
+            </p>
+          </Link>
+
+          <Link href="/english-story"
+            className="block p-6 bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow">
+            <div className="text-2xl mb-3">📚</div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-900">영어 스토리 생성</h3>
+            <p className="text-gray-600 text-sm">
+              여러 영어 단어를 입력하여 재미있는 영어 이야기를 만들어보세요.
             </p>
           </Link>
 

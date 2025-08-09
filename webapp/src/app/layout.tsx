@@ -28,6 +28,7 @@ export default function RootLayout({
           </Link>
           <nav className="flex gap-4">
             <Link href="/english-sentence" className="hover:underline">영어 문장 생성</Link>
+            <Link href="/english-story" className="hover:underline">영어 스토리 생성</Link>
             <Link href="/celebration-message" className="hover:underline">축하 문구 생성</Link>
           </nav>
         </header>

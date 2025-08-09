@@ -119,10 +119,14 @@ ${difficultyInstructions[difficulty]}
 3. 논리적이고 일관성 있는 스토리여야 합니다
 4. 완전한 문장들로 구성되어야 합니다
 5. 흥미롭고 교육적인 내용이어야 합니다
+6. **중요**: 단어 목록의 각 단어는 HTML 태그를 사용하여 다음과 같이 강조해주세요:
+   - 기본 단어: <span style="color: #dc2626; font-weight: bold;">단어</span>
+   - 중요한 단어: <span style="color: #dc2626; font-weight: bold; background-color: #fef2f2; padding: 2px 4px; border-radius: 3px;">단어</span>
+   - 단어가 변형된 경우(예: 복수형, 과거형)도 동일하게 강조해주세요
 
 응답은 반드시 다음 JSON 형식으로만 제공해주세요:
 {
-  "englishStory": "영어 이야기 내용",
+  "englishStory": "HTML 태그가 포함된 영어 이야기 내용",
   "koreanTranslation": "한국어 번역"
 }
 

@@ -1,23 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { callLLM } from '@/lib/llm-client';
-import { validateLLMConfig } from '@/lib/llm-config';
+import { validateLLMConfig, getAvailableProviders, getPrimaryProvider } from '@/lib/llm-config';
 import { generateEnglishStory, validateWordMeanings, generatePrompt, parseApiResponse, getMaxTokensForDifficulty } from '@/lib/english-story';
 import { WordMeaning, StoryDifficulty, StoryGenerationError, StoryResult } from '@/lib/english-story.types';
 
 export async function POST(request: NextRequest) {
     try {
         // LLM 설정 유효성 검사
-        try {
-            validateLLMConfig();
-        } catch (error) {
-            console.error('❌ LLM 설정 검증 실패:', error);
+        const configValidation = validateLLMConfig();
+
+        if (!configValidation.isValid) {
+            console.error('❌ LLM 설정 검증 실패:', configValidation.errors);
             return NextResponse.json(
                 {
                     error: 'AI 서비스 설정에 문제가 있습니다. 환경 변수를 확인해주세요.',
-                    details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+                    details: process.env.NODE_ENV === 'development' ? configValidation.errors : undefined
                 },
                 { status: 503 }
             );
+        }
+
+        // 개발 환경에서 설정 정보 출력
+        if (process.env.NODE_ENV === 'development') {
+            const availableProviders = getAvailableProviders();
+            const primaryProvider = getPrimaryProvider();
+            console.log(`🔧 Story API - 사용 가능한 프로바이더: [${availableProviders.join(', ')}], 기본: ${primaryProvider}`);
+
+            if (configValidation.warnings.length > 0) {
+                console.warn('⚠️ 설정 참고사항:', configValidation.warnings);
+            }
         }
 
         // Request body 파싱 및 검증

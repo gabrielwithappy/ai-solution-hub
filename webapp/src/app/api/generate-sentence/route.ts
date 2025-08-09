@@ -13,27 +13,27 @@ import { validateLLMConfig } from '@/lib/llm-config';
 function scrambleSentence(sentence: string): string {
   const words = sentence.split(/(\s+|[.,!?;:])/); // 구두점 보존하며 분리
   const wordIndices: number[] = [];
-  
+
   // 실제 단어(구두점이 아닌)의 인덱스만 수집
   words.forEach((word, index) => {
     if (word.trim() && !word.match(/^[.,!?;:\s]+$/)) {
       wordIndices.push(index);
     }
   });
-  
+
   // 단어 인덱스를 섞기
   const shuffledIndices = [...wordIndices];
   for (let i = shuffledIndices.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffledIndices[i], shuffledIndices[j]] = [shuffledIndices[j], shuffledIndices[i]];
   }
-  
+
   // 섞인 순서로 단어 재배치
   const result = [...words];
   wordIndices.forEach((originalIndex, i) => {
     result[originalIndex] = words[shuffledIndices[i]];
   });
-  
+
   return result.join('');
 }
 
@@ -43,16 +43,16 @@ function scrambleSentence(sentence: string): string {
 function parseExamples(content: string): Omit<SentenceExample, 'scrambledSentence'>[] {
   const examples: Omit<SentenceExample, 'scrambledSentence'>[] = [];
   const sections = content.split(/의미\d+:/);
-  
+
   sections.forEach(section => {
     if (!section.trim()) return;
-    
+
     const lines = section.trim().split('\n').filter(line => line.trim());
     if (lines.length >= 3) {
       const meaning = lines[0].trim();
       const originalSentence = lines[1].trim();
       const koreanTranslation = lines[2].trim();
-      
+
       examples.push({
         meaning,
         originalSentence,
@@ -60,7 +60,7 @@ function parseExamples(content: string): Omit<SentenceExample, 'scrambledSentenc
       });
     }
   });
-  
+
   return examples;
 }
 
@@ -88,19 +88,25 @@ export async function POST(request: NextRequest) {
     if (!configValidation.isValid) {
       console.error('❌ LLM 설정 오류:', configValidation.errors);
       return NextResponse.json(
-        { error: 'LLM API 설정이 올바르지 않습니다.', details: configValidation.errors },
+        { error: 'AI 서비스 설정에 문제가 있습니다. 환경 변수를 확인해주세요.', details: configValidation.errors },
         { status: 500 }
       );
     }
 
-    // ⚠️ 경고가 있으면 로그 출력
-    if (configValidation.warnings.length > 0) {
-      console.warn('⚠️ LLM 설정 경고:', configValidation.warnings);
+    // 사용 가능한 프로바이더 정보 출력 (개발 환경에서만)
+    if (process.env.NODE_ENV === 'development') {
+      const availableProviders = getAvailableProviders();
+      const primaryProvider = getPrimaryProvider();
+      console.log(`🔧 LLM 설정 - 사용 가능: [${availableProviders.join(', ')}], 기본: ${primaryProvider}`);
+
+      if (configValidation.warnings.length > 0) {
+        console.warn('⚠️ 설정 참고사항:', configValidation.warnings);
+      }
     }
 
     // Request body 파싱 및 검증
     const body: GenerateSentenceRequest = await request.json();
-    
+
     if (!body.word || body.word.length === 0) {
       return NextResponse.json(
         { error: '영어 단어를 입력해주세요.' },
@@ -166,16 +172,16 @@ We need to test this new feature.
     };
 
     console.log(`✅ 영어 문장 생성 완료 - Provider: ${llmResponse.provider}, 예시 수: ${examples.length}`);
-    
+
     return NextResponse.json(response);
 
   } catch (error) {
     console.error('❌ 영어 문장 생성 API 오류:', error);
-    
+
     // LLM API 연결 실패 시 사용자 친화적 메시지
     if (error instanceof Error && error.message.includes('API')) {
       return NextResponse.json(
-        { 
+        {
           error: 'AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
           details: process.env.NODE_ENV === 'development' ? error.message : undefined
         },

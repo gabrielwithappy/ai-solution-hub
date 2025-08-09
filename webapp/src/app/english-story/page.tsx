@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { WordMeaning, StoryDifficulty, StoryResponse } from '@/lib/english-story.types';
-import { generateEnglishStory } from '@/lib/english-story';
 import { createTTSUtility } from '@/lib/tts';
 import LoadingIndicator from '@/components/ui/LoadingIndicator';
 import Button from '@/components/ui/Button';
@@ -18,6 +17,11 @@ export default function EnglishStoryPage() {
 
     // TTS 유틸리티 초기화
     const ttsUtility = createTTSUtility();
+
+    // HTML 태그 제거 함수
+    const stripHtmlTags = (html: string): string => {
+        return html.replace(/<[^>]*>/g, '');
+    };
 
     const addWord = () => {
         if (words.length < 20) {
@@ -52,7 +56,24 @@ export default function EnglishStoryPage() {
                 throw new Error('최소 1개 이상의 단어를 입력해야 합니다.');
             }
 
-            const result = await generateEnglishStory(validWords, difficulty);
+            // API 호출로 변경
+            const response = await fetch('/api/generate-story', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    words: validWords,
+                    difficulty: difficulty
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || '스토리 생성 중 오류가 발생했습니다.');
+            }
+
+            const result = await response.json();
             setStory(result);
             setShowTranslation(false); // 기본값은 가림 상태
         } catch (err) {
@@ -64,12 +85,16 @@ export default function EnglishStoryPage() {
 
     const handleTTS = () => {
         if (story?.englishStory) {
-            ttsUtility.speak(story.englishStory);
+            // HTML 태그 제거 후 TTS 재생
+            const cleanText = stripHtmlTags(story.englishStory);
+            ttsUtility.speak(cleanText);
         }
     };
 
     const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text).then(() => {
+        // HTML 태그 제거 후 클립보드에 복사
+        const cleanText = stripHtmlTags(text);
+        navigator.clipboard.writeText(cleanText).then(() => {
             alert('클립보드에 복사되었습니다.');
         });
     };
@@ -211,7 +236,10 @@ export default function EnglishStoryPage() {
                             </div>
 
                             <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                                <p className="text-lg leading-relaxed">{story.englishStory}</p>
+                                <div
+                                    className="text-lg leading-relaxed"
+                                    dangerouslySetInnerHTML={{ __html: story.englishStory }}
+                                />
                             </div>
 
                             <div className="flex justify-between items-center mb-2">

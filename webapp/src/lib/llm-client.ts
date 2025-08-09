@@ -2,12 +2,13 @@
  * LLM API 클라이언트 유틸리티
  */
 
-import { 
-  LLMProvider, 
+import {
+  LLMProvider,
   LLMConfig,
-  getLLMConfig, 
-  getPrimaryProvider, 
-  getFallbackProvider 
+  getLLMConfig,
+  getPrimaryProvider,
+  getFallbackProvider,
+  getAvailableProviders
 } from './llm-config';
 
 export interface LLMRequest {
@@ -88,7 +89,7 @@ async function callOpenAI(config: LLMConfig, request: LLMRequest): Promise<LLMRe
   }
 
   const data: OpenAIResponse = await response.json();
-  
+
   return {
     content: data.choices[0]?.message?.content || '',
     provider: 'openai',
@@ -125,7 +126,7 @@ async function callGemini(config: LLMConfig, request: LLMRequest): Promise<LLMRe
   }
 
   const data: GeminiResponse = await response.json();
-  
+
   return {
     content: data.candidates[0]?.content?.parts[0]?.text || '',
     provider: 'gemini',
@@ -161,7 +162,7 @@ async function callClaude(config: LLMConfig, request: LLMRequest): Promise<LLMRe
   }
 
   const data: ClaudeResponse = await response.json();
-  
+
   return {
     content: data.content[0]?.text || '',
     provider: 'claude',
@@ -179,40 +180,42 @@ async function callClaude(config: LLMConfig, request: LLMRequest): Promise<LLMRe
 export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
   const primaryProvider = getPrimaryProvider();
   const fallbackProvider = getFallbackProvider();
-  
-  console.log(`🤖 LLM 호출 - Primary: ${primaryProvider}, Fallback: ${fallbackProvider || 'none'}`);
-  
+  const availableProviders = getAvailableProviders();
+
+  console.log(`🤖 LLM 호출 - 사용 가능한 프로바이더: ${availableProviders.join(', ')}`);
+
   try {
     // Primary provider 시도
     const primaryConfig = getLLMConfig(primaryProvider);
     if (!primaryConfig?.apiKey) {
-      throw new Error(`${primaryProvider} API 키가 설정되지 않았습니다.`);
+      throw new Error(`${primaryProvider} API 키가 설정되지 않음`);
     }
-    
+
     const response = await callLLMWithProvider(primaryProvider, primaryConfig, request);
     console.log(`✅ ${primaryProvider} API 호출 성공`);
     return response;
-    
+
   } catch (error) {
-    console.error(`❌ ${primaryProvider} API 호출 실패:`, error);
-    
-    // Fallback provider 시도
+    // Primary provider 실패 시 fallback 시도
     if (fallbackProvider) {
+      console.log(`⚠️  ${primaryProvider} 사용 불가, ${fallbackProvider}로 전환 중...`);
+
       try {
         const fallbackConfig = getLLMConfig(fallbackProvider);
         if (!fallbackConfig?.apiKey) {
-          throw new Error(`${fallbackProvider} API 키가 설정되지 않았습니다.`);
+          throw new Error(`${fallbackProvider} API 키가 설정되지 않음`);
         }
-        
+
         const response = await callLLMWithProvider(fallbackProvider, fallbackConfig, request);
-        console.log(`✅ ${fallbackProvider} API 호출 성공 (fallback)`);
+        console.log(`✅ ${fallbackProvider} API 호출 성공 (대체 프로바이더)`);
         return response;
-        
+
       } catch (fallbackError) {
         console.error(`❌ ${fallbackProvider} API 호출도 실패:`, fallbackError);
         throw new Error(`모든 LLM API 호출 실패. Primary: ${error}, Fallback: ${fallbackError}`);
       }
     } else {
+      console.error(`❌ ${primaryProvider} API 호출 실패, 사용 가능한 대체 프로바이더 없음:`, error);
       throw error;
     }
   }
@@ -222,8 +225,8 @@ export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
  * 특정 provider로 LLM API 호출
  */
 async function callLLMWithProvider(
-  provider: LLMProvider, 
-  config: LLMConfig, 
+  provider: LLMProvider,
+  config: LLMConfig,
   request: LLMRequest
 ): Promise<LLMResponse> {
   switch (provider) {

@@ -82,6 +82,7 @@ interface StoryResult {
 ```
 
 **주요 기능:**
+
 - 사용자 입력 폼 관리
 - API 호출 및 상태 관리
 - HTML 콘텐츠 렌더링 (`dangerouslySetInnerHTML`)

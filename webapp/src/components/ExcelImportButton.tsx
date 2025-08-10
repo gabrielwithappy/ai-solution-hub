@@ -133,27 +133,22 @@ const ExcelImportButton: React.FC<ExcelImportButtonProps> = ({
         .excel-import-button {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           background: #28a745;
           color: white;
           border: none;
-          padding: 12px 20px;
-          border-radius: 8px;
-          font-size: 16px;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 14px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s ease;
-          box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+          box-shadow: 0 1px 2px rgba(40, 167, 69, 0.1);
         }
 
         .excel-import-button:hover:not(.disabled) {
           background: #218838;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-        }
-
-        .excel-import-button:active:not(.disabled) {
-          transform: translateY(0);
+          box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
         }
 
         .excel-import-button.disabled {
@@ -163,7 +158,7 @@ const ExcelImportButton: React.FC<ExcelImportButtonProps> = ({
         }
 
         .button-icon {
-          font-size: 18px;
+          font-size: 16px;
         }
 
         .success-message {

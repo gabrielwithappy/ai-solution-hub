@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { WordMeaning, StoryDifficulty, StoryResponse } from '@/lib/english-story.types';
 import { createTTSUtility } from '@/lib/tts';
+import { PrintButton } from '@/components/PrintButton';
 import LoadingIndicator from '@/components/ui/LoadingIndicator';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -226,6 +227,12 @@ export default function EnglishStoryPage() {
                                     >
                                         🔊 음성 듣기
                                     </Button>
+                                    <PrintButton
+                                        story={story}
+                                        variant="secondary"
+                                        size="md"
+                                        showPreview={false}
+                                    />
                                     <Button
                                         onClick={() => copyToClipboard(story.englishStory)}
                                         className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"

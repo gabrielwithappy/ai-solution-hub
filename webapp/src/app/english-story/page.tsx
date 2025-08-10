@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { WordMeaning, StoryDifficulty, StoryResponse } from '@/lib/english-story.types';
+import { ExcelImportData } from '@/lib/excel-import-utils';
 import { createTTSUtility } from '@/lib/tts';
 import { PrintButton } from '@/components/PrintButton';
 import { ExcelExportButton } from '@/components/ExcelExportButton';
+import ExcelImportButton from '@/components/ExcelImportButton';
 import LoadingIndicator from '@/components/ui/LoadingIndicator';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -101,6 +103,23 @@ export default function EnglishStoryPage() {
         });
     };
 
+    // Excel 업로드 처리 함수들
+    const handleExcelImport = (data: ExcelImportData[]) => {
+        // Excel 데이터를 WordMeaning 형식으로 변환
+        const convertedWords: WordMeaning[] = data.map(item => ({
+            englishWord: item.englishWord,
+            koreanMeaning: item.koreanMeaning
+        }));
+
+        // 20개 제한
+        const limitedWords = convertedWords.slice(0, 20);
+        setWords(limitedWords);
+    };
+
+    const handleExcelError = (error: string) => {
+        setError(error);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,6 +136,20 @@ export default function EnglishStoryPage() {
                     {/* 단어 입력 섹션 */}
                     <Card>
                         <h2 className="text-xl font-semibold mb-4">영어 단어 입력</h2>
+
+                        {/* Excel 업로드 버튼 */}
+                        <div className="mb-4">
+                            <ExcelImportButton
+                                onImport={handleExcelImport}
+                                onError={handleExcelError}
+                                disabled={isLoading}
+                            />
+                        </div>
+
+                        <p className="text-sm text-gray-600 mb-4">
+                            여러 영어 단어를 입력하여 스토리를 생성하세요. 최대 20개까지 입력 가능합니다.
+                        </p>
+
                         <div className="space-y-3">
                             {words.map((word, index) => (
                                 <div key={index} className="flex gap-3 items-center">

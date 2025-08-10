@@ -67,7 +67,6 @@ const ExcelImportDropzone: React.FC<ExcelImportDropzoneProps> = ({
     const handleDragEnter = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('dragenter', e.dataTransfer.types);
         if (!disabled) {
             setIsDragOver(true);
         }
@@ -76,7 +75,6 @@ const ExcelImportDropzone: React.FC<ExcelImportDropzoneProps> = ({
     const handleDragLeave = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('dragleave', e.target, e.currentTarget);
 
         // Only reset drag state if leaving the main dropzone element
         if (e.target === e.currentTarget) {
@@ -87,7 +85,6 @@ const ExcelImportDropzone: React.FC<ExcelImportDropzoneProps> = ({
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('dragover');
     }, []);
 
     const handleDrop = useCallback((e: React.DragEvent) => {
@@ -95,13 +92,10 @@ const ExcelImportDropzone: React.FC<ExcelImportDropzoneProps> = ({
         e.stopPropagation();
         setIsDragOver(false);
 
-        console.log('drop', e.dataTransfer.files);
-
         if (disabled || isLoading) return;
 
         const files = Array.from(e.dataTransfer.files);
         if (files.length > 0) {
-            console.log('Processing file:', files[0].name, files[0].type);
             handleFileProcessing(files[0]);
         }
     }, [disabled, isLoading, handleFileProcessing]);    // 파일 입력 핸들러

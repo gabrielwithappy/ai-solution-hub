@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { WordMeaning, StoryDifficulty, StoryResponse } from '@/lib/english-story.types';
 import { createTTSUtility } from '@/lib/tts';
 import { PrintButton } from '@/components/PrintButton';
+import { ExcelExportButton } from '@/components/ExcelExportButton';
 import LoadingIndicator from '@/components/ui/LoadingIndicator';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -232,6 +233,11 @@ export default function EnglishStoryPage() {
                                         variant="secondary"
                                         size="md"
                                         showPreview={false}
+                                    />
+                                    <ExcelExportButton
+                                        story={story}
+                                        variant="secondary"
+                                        size="md"
                                     />
                                     <Button
                                         onClick={() => copyToClipboard(story.englishStory)}

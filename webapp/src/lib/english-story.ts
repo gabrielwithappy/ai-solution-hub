@@ -60,9 +60,9 @@ export function resolveAmbiguousWords(words: WordMeaning[]): WordMeaning[] {
  */
 export function getMaxTokensForDifficulty(difficulty: StoryDifficulty): number {
     const tokenLimits = {
-        easy: 300,    // 짧은 이야기
-        medium: 500,  // 중간 길이 이야기
-        hard: 800     // 긴 이야기
+        easy: 800,    // 짧은 이야기 (HTML 스타일링 포함)
+        medium: 1200,  // 중간 길이 이야기 (HTML 스타일링 포함)
+        hard: 1800     // 긴 이야기 (HTML 스타일링 포함)
     };
     return tokenLimits[difficulty];
 }
@@ -152,42 +152,131 @@ export function parseApiResponse(
 ): StoryResponse {
     let parsedResponse: Record<string, unknown>;
 
+    console.log('🔍 LLM 응답 디버깅 시작');
+    console.log('응답 타입:', typeof response);
+    console.log('응답 길이:', typeof response === 'string' ? response.length : 'N/A');
+
     // LLM 응답에서 JSON 추출 시도
     if (typeof response === 'string') {
+        console.log('📄 원본 LLM 응답 내용:');
+        console.log('='.repeat(50));
+        console.log(response);
+        console.log('='.repeat(50));
+
         try {
             // JSON 블록 찾기 (```json으로 감싸진 경우)
             const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
             if (jsonMatch) {
+                console.log('✅ JSON 블록 발견 (```json으로 감싸진 형태)');
+                console.log('추출된 JSON:', jsonMatch[1]);
                 parsedResponse = JSON.parse(jsonMatch[1]);
             } else {
-                // 중괄호로 시작하는 JSON 찾기
-                const jsonStart = response.indexOf('{');
-                const jsonEnd = response.lastIndexOf('}');
-                if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-                    const jsonStr = response.substring(jsonStart, jsonEnd + 1);
-                    parsedResponse = JSON.parse(jsonStr);
+                // 다른 JSON 패턴들 시도
+                console.log('🔍 다양한 JSON 패턴 시도 중...');
+
+                // 패턴 1: ```로 감싸진 JSON (언어 태그 없음)
+                const jsonMatch2 = response.match(/```\s*([\s\S]*?)\s*```/);
+                if (jsonMatch2 && jsonMatch2[1].trim().startsWith('{')) {
+                    console.log('✅ JSON 블록 발견 (```로 감싸진 형태)');
+                    console.log('추출된 JSON:', jsonMatch2[1]);
+                    parsedResponse = JSON.parse(jsonMatch2[1]);
                 } else {
-                    throw new Error('JSON 형식을 찾을 수 없습니다.');
+                    // 패턴 2: 중괄호로 시작하는 JSON 찾기
+                    const jsonStart = response.indexOf('{');
+                    const jsonEnd = response.lastIndexOf('}');
+                    console.log(`🔍 JSON 범위 찾기: start=${jsonStart}, end=${jsonEnd}`);
+
+                    if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+                        const jsonStr = response.substring(jsonStart, jsonEnd + 1);
+                        console.log('✅ JSON 문자열 추출:');
+                        console.log(jsonStr);
+
+                        // JSON 유효성 사전 검사
+                        const braceCount = (jsonStr.match(/\{/g) || []).length - (jsonStr.match(/\}/g) || []).length;
+                        console.log('🔍 중괄호 균형 검사:', braceCount === 0 ? '균형맞음' : `불균형(${braceCount})`);
+
+                        parsedResponse = JSON.parse(jsonStr);
+                    } else {
+                        console.error('❌ JSON 형식을 찾을 수 없습니다. 응답에서 중괄호를 찾지 못했습니다.');
+                        console.log('응답에서 찾은 중괄호 위치:');
+                        console.log('첫 번째 { 위치:', jsonStart);
+                        console.log('마지막 } 위치:', jsonEnd);
+
+                        // 부분적인 JSON 복구 시도
+                        console.log('🔧 부분적인 JSON 복구를 시도합니다...');
+                        if (jsonStart !== -1) {
+                            const partialJson = response.substring(jsonStart);
+                            console.log('부분적인 JSON:', partialJson.substring(0, 200) + '...');
+
+                            // englishStory와 koreanTranslation을 정규식으로 추출 시도
+                            try {
+                                const englishMatch = partialJson.match(/"englishStory":\s*"([^"\\]*(\\.[^"\\]*)*)"/);
+                                const koreanMatch = partialJson.match(/"koreanTranslation":\s*"([^"\\]*(\\.[^"\\]*)*)"/);
+
+                                if (englishMatch && koreanMatch) {
+                                    console.log('✅ 부분적인 JSON에서 필드 추출 성공');
+                                    return {
+                                        englishStory: englishMatch[1],
+                                        koreanTranslation: koreanMatch[1] + ' (응답이 잘렸습니다. 더 긴 내용이 필요한 경우 다시 시도해주세요.)',
+                                        usedWords: originalWords,
+                                        difficulty: difficulty
+                                    };
+                                }
+                            } catch (partialError) {
+                                console.log('부분적인 JSON 복구 실패:', partialError);
+                            }
+                        }
+
+                        // 응답에서 JSON 키워드 찾기 시도
+                        const hasEnglishStory = response.includes('englishStory');
+                        const hasKoreanTranslation = response.includes('koreanTranslation');
+                        console.log('englishStory 키 존재:', hasEnglishStory);
+                        console.log('koreanTranslation 키 존재:', hasKoreanTranslation);
+
+                        throw new Error('JSON 형식을 찾을 수 없습니다.');
+                    }
                 }
             }
         } catch (parseError) {
-            console.error('JSON 파싱 실패:', parseError);
+            console.error('❌ JSON 파싱 실패:', parseError);
+            console.log('파싱 시도한 문자열 길이:', response.length);
+            console.log('응답 첫 100자:', response.substring(0, 100));
+            console.log('응답 마지막 100자:', response.substring(Math.max(0, response.length - 100)));
             throw new StoryGenerationError('스토리 생성 응답 형식이 올바르지 않습니다.');
         }
     } else if (typeof response === 'object') {
+        console.log('✅ 이미 객체 형태의 응답');
         parsedResponse = response;
     } else {
+        console.error('❌ 지원되지 않는 응답 형식:', typeof response);
         throw new StoryGenerationError('스토리 생성 응답 형식이 올바르지 않습니다.');
     }
 
+    console.log('🔍 파싱된 응답 분석:');
+    console.log('파싱된 객체 키들:', Object.keys(parsedResponse));
+    console.log('englishStory 존재:', 'englishStory' in parsedResponse);
+    console.log('koreanTranslation 존재:', 'koreanTranslation' in parsedResponse);
+
     const { englishStory, koreanTranslation } = parsedResponse;
 
+    console.log('🔍 추출된 필드 분석:');
+    console.log('englishStory 타입:', typeof englishStory);
+    console.log('englishStory 길이:', typeof englishStory === 'string' ? englishStory.length : 'N/A');
+    console.log('koreanTranslation 타입:', typeof koreanTranslation);
+    console.log('koreanTranslation 길이:', typeof koreanTranslation === 'string' ? koreanTranslation.length : 'N/A');
+
     if (!englishStory || !koreanTranslation) {
+        console.error('❌ 필수 필드 누락:');
+        console.log('englishStory:', englishStory);
+        console.log('koreanTranslation:', koreanTranslation);
         throw new StoryGenerationError('스토리 생성 응답에 필수 필드가 누락되었습니다.');
     }
 
     // 기본적인 내용 검증
     if (typeof englishStory !== 'string' || typeof koreanTranslation !== 'string') {
+        console.error('❌ 필드 타입 오류:');
+        console.log('englishStory 타입:', typeof englishStory);
+        console.log('koreanTranslation 타입:', typeof koreanTranslation);
         throw new StoryGenerationError('스토리 내용이 올바른 형식이 아닙니다.');
     }
 

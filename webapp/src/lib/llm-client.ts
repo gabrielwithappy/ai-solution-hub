@@ -79,7 +79,7 @@ async function callOpenAI(config: LLMConfig, request: LLMRequest): Promise<LLMRe
     body: JSON.stringify({
       model: config.model,
       messages: [{ role: 'user', content: request.prompt }],
-      max_tokens: request.maxTokens || 1000,
+      max_tokens: request.maxTokens || 2000,
       temperature: request.temperature || 0.7
     })
   });
@@ -116,7 +116,7 @@ async function callGemini(config: LLMConfig, request: LLMRequest): Promise<LLMRe
       }],
       generationConfig: {
         temperature: request.temperature || 0.7,
-        maxOutputTokens: request.maxTokens || 1000
+        maxOutputTokens: request.maxTokens || 2000
       }
     })
   });
@@ -151,7 +151,7 @@ async function callClaude(config: LLMConfig, request: LLMRequest): Promise<LLMRe
     },
     body: JSON.stringify({
       model: config.model,
-      max_tokens: request.maxTokens || 1000,
+      max_tokens: request.maxTokens || 2000,
       temperature: request.temperature || 0.7,
       messages: [{ role: 'user', content: request.prompt }]
     })

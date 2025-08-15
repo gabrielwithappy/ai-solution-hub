@@ -28,7 +28,7 @@ export default function EnglishStoryPage() {
     };
 
     const addWord = () => {
-        if (words.length < 20) {
+        if (words.length < 10) {
             setWords([...words, { englishWord: '', koreanMeaning: '' }]);
         }
     };
@@ -111,8 +111,8 @@ export default function EnglishStoryPage() {
             koreanMeaning: item.koreanMeaning
         }));
 
-        // 20개 제한
-        const limitedWords = convertedWords.slice(0, 20);
+        // 10개 제한
+        const limitedWords = convertedWords.slice(0, 10);
         setWords(limitedWords);
     };
 
@@ -147,7 +147,7 @@ export default function EnglishStoryPage() {
                         </div>
 
                         <p className="text-sm text-gray-600 mb-4">
-                            여러 영어 단어를 입력하여 스토리를 생성하세요. 최대 20개까지 입력 가능합니다.
+                            여러 영어 단어를 입력하여 스토리를 생성하세요. 최대 10개까지 입력 가능합니다.
                         </p>
 
                         <div className="space-y-3">
@@ -187,10 +187,10 @@ export default function EnglishStoryPage() {
                             <Button
                                 type="button"
                                 onClick={addWord}
-                                disabled={words.length >= 20}
+                                disabled={words.length >= 10}
                                 className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:bg-gray-300"
                             >
-                                단어 추가 ({words.length}/20)
+                                단어 추가 ({words.length}/10)
                             </Button>
                         </div>
                     </Card>

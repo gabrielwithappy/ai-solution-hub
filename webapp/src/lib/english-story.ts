@@ -15,14 +15,14 @@ export function validateWordMeanings(
     words: WordMeaning[],
     options: ValidationOptions = {}
 ): void {
-    const { minWords = 1, maxWords = 20, allowSpecialChars = false } = options;
+    const { minWords = 1, maxWords = 10, allowSpecialChars = false } = options;
 
     if (words.length < minWords) {
         throw new StoryGenerationError('최소 1개 이상의 단어를 입력해야 합니다.');
     }
 
     if (words.length > maxWords) {
-        throw new StoryGenerationError('최대 20개까지의 단어만 입력 가능합니다.');
+        throw new StoryGenerationError('최대 10개까지의 단어만 입력 가능합니다.');
     }
 
     for (const word of words) {

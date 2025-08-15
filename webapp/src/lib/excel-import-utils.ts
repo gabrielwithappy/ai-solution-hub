@@ -18,7 +18,7 @@ const SUPPORTED_FILE_TYPES = [
 ];
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const MAX_WORDS = 20;
+const MAX_WORDS = 10;
 
 /**
  * Excel 파일을 파싱하여 영어 단어와 한국어 의미를 추출합니다.
@@ -102,7 +102,7 @@ export async function parseExcelFile(file: File): Promise<ExcelImportData[]> {
                 koreanMeaning
             });
 
-            // 최대 20개 제한 (FR-047, FR-059)
+            // 최대 10개 제한 (FR-047, FR-059)
             if (result.length >= MAX_WORDS) {
                 break;
             }
@@ -129,9 +129,9 @@ export function validateExcelData(data: ExcelImportData[]): ValidationResult {
         return { isValid: false, errors, warnings };
     }
 
-    // 20개 초과 검사 (FR-059)
+    // 10개 초과 검사 (FR-059)
     if (data.length > MAX_WORDS) {
-        warnings.push('20개를 초과하는 단어가 있어 처음 20개만 처리됩니다.');
+        warnings.push('10개를 초과하는 단어가 있어 처음 10개만 처리됩니다.');
         data = data.slice(0, MAX_WORDS);
     }
 

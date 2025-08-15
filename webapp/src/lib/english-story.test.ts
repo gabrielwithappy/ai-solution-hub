@@ -66,13 +66,13 @@ describe('영어 단어 기반 스토리 생성 기능', () => {
         });
 
         test('단어가 너무 많으면 에러를 발생시켜야 한다', async () => {
-            const words: WordMeaning[] = Array.from({ length: 21 }, (_, i) => ({
+            const words: WordMeaning[] = Array.from({ length: 11 }, (_, i) => ({
                 englishWord: `word${i}`,
                 koreanMeaning: `단어${i}`
             }));
 
             await expect(generateEnglishStory(words, 'easy')).rejects.toThrow(
-                '최대 20개까지의 단어만 입력 가능합니다.'
+                '최대 10개까지의 단어만 입력 가능합니다.'
             );
         });
     });

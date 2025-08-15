@@ -114,12 +114,12 @@ describe('Excel Import Utils', () => {
             ]);
         });
 
-        it('should limit to 20 words maximum', async () => {
+        it('should limit to 10 words maximum', async () => {
             // Given
             const mockFile = new File([''], 'test.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const mockWorkbook = { SheetNames: ['Sheet1'], Sheets: { Sheet1: {} } };
             const headers = ['English Word', 'Korean Meaning'];
-            const dataRows = Array.from({ length: 25 }, (_, i) => [`word${i + 1}`, `의미${i + 1}`]);
+            const dataRows = Array.from({ length: 15 }, (_, i) => [`word${i + 1}`, `의미${i + 1}`]);
 
             mockRead.mockReturnValue(mockWorkbook);
             mockSheetToJson.mockReturnValue([headers, ...dataRows]);
@@ -128,9 +128,9 @@ describe('Excel Import Utils', () => {
             const result = await parseExcelFile(mockFile);
 
             // Then
-            expect(result).toHaveLength(20);
+            expect(result).toHaveLength(10);
             expect(result[0]).toEqual({ englishWord: 'word1', koreanMeaning: '의미1' });
-            expect(result[19]).toEqual({ englishWord: 'word20', koreanMeaning: '의미20' });
+            expect(result[9]).toEqual({ englishWord: 'word10', koreanMeaning: '의미10' });
         });
 
         it('should throw error for unsupported file types', async () => {
@@ -213,9 +213,9 @@ describe('Excel Import Utils', () => {
             expect(result.errors).toContain('업로드된 파일에 유효한 데이터가 없습니다.');
         });
 
-        it('should return error for data exceeding 20 words', () => {
+        it('should return error for data exceeding 10 words', () => {
             // Given
-            const data: ExcelImportData[] = Array.from({ length: 25 }, (_, i) => ({
+            const data: ExcelImportData[] = Array.from({ length: 15 }, (_, i) => ({
                 englishWord: `word${i + 1}`,
                 koreanMeaning: `의미${i + 1}`,
             }));
@@ -225,7 +225,7 @@ describe('Excel Import Utils', () => {
 
             // Then
             expect(result.isValid).toBe(true);
-            expect(result.warnings).toContain('20개를 초과하는 단어가 있어 처음 20개만 처리됩니다.');
+            expect(result.warnings).toContain('10개를 초과하는 단어가 있어 처음 10개만 처리됩니다.');
         });
     });
 });

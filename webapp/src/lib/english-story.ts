@@ -60,9 +60,9 @@ export function resolveAmbiguousWords(words: WordMeaning[]): WordMeaning[] {
  */
 export function getMaxTokensForDifficulty(difficulty: StoryDifficulty): number {
     const tokenLimits = {
-        easy: 800,    // 짧은 이야기 (HTML 스타일링 포함)
-        medium: 1200,  // 중간 길이 이야기 (HTML 스타일링 포함)
-        hard: 1800     // 긴 이야기 (HTML 스타일링 포함)
+        easy: 1200,    // 짧은 이야기 (HTML 스타일링 포함)
+        medium: 2400,  // 중간 길이 이야기 (HTML 스타일링 포함)
+        hard: 3800     // 긴 이야기 (HTML 스타일링 포함)
     };
     return tokenLimits[difficulty];
 }

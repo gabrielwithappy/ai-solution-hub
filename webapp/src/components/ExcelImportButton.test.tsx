@@ -1,11 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import ExcelImportButton from './ExcelImportButton';
 
 // Mock components
 jest.mock('./ExcelImportDropzone', () => {
-    return function MockExcelImportDropzone({ onImport, onError, onWarning }: any) {
+    return function MockExcelImportDropzone({ onImport, onError, onWarning }: {
+        onImport: (data: Array<{ englishWord: string; koreanMeaning: string }>) => void;
+        onError: (error: string) => void;
+        onWarning: (warning: string) => void;
+    }) {
         return (
             <div data-testid="excel-dropzone">
                 <button
@@ -19,7 +22,7 @@ jest.mock('./ExcelImportDropzone', () => {
                 <button onClick={() => onError('Test error')}>
                     Trigger Error
                 </button>
-                <button onClick={() => onWarning(['Test warning'])}>
+                <button onClick={() => onWarning('Test warning')}>
                     Trigger Warning
                 </button>
             </div>
@@ -28,7 +31,13 @@ jest.mock('./ExcelImportDropzone', () => {
 });
 
 jest.mock('./ExcelPreviewModal', () => {
-    return function MockExcelPreviewModal({ isOpen, data, warnings, onConfirm, onCancel }: any) {
+    return function MockExcelPreviewModal({ isOpen, data, warnings, onConfirm, onCancel }: {
+        isOpen: boolean;
+        data: Array<{ englishWord: string; koreanMeaning: string }>;
+        warnings: string[];
+        onConfirm: () => void;
+        onCancel: () => void;
+    }) {
         if (!isOpen) return null;
         return (
             <div data-testid="preview-modal">

@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import { StoryResponse } from '@/lib/english-story.types';
-import { printStory, generatePrintPreview } from '@/lib/print-utils';
+import { generatePrintPreview } from '@/lib/print-utils';
 
 interface PrintButtonProps {
     story: StoryResponse;

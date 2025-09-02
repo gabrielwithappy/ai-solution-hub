@@ -121,9 +121,6 @@ describe('Markdown Template System', () => {
 
     describe('Template Engine', () => {
         it('변수 치환이 올바르게 작동한다', () => {
-            const template = 'Title: {{title}}, Date: {{date}}, Count: {{wordCount}}';
-            const data = storyToTemplateData(mockStory);
-
             // 간단한 템플릿 엔진 테스트를 위해 직접 호출
             const markdown = generateMarkdownFromTemplate(mockStory, 'default');
 

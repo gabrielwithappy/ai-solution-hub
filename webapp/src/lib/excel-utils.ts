@@ -25,7 +25,7 @@ export function formatExcelDate(date: Date): string {
  * @param story 스토리 데이터
  * @returns Excel용 데이터 배열
  */
-export function generateExcelData(story: StoryResponse): any[] {
+export function generateExcelData(story: StoryResponse): Record<string, string | number>[] {
     const currentDate = formatExcelDate(new Date());
     const storyTitle = 'Generated English Story';
 

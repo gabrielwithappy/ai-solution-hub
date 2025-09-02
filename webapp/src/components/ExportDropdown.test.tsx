@@ -40,8 +40,8 @@ describe('ExportDropdown', () => {
         jest.clearAllMocks();
         mockCreateObjectURL.mockReturnValue('mock-url');
 
-        // Mock markdown template functions
-        const { generateMarkdownFromTemplate, getAvailableTemplates } = require('@/lib/markdown-template');
+        // Setup markdown template mocks
+        const { generateMarkdownFromTemplate, getAvailableTemplates } = jest.requireMock('@/lib/markdown-template');
         generateMarkdownFromTemplate.mockReturnValue('# Generated Markdown Content');
         getAvailableTemplates.mockReturnValue([
             {
@@ -95,7 +95,7 @@ describe('ExportDropdown', () => {
     });
 
     it('Excel 내보내기 메뉴 클릭 시 Excel 파일이 다운로드된다', async () => {
-        const { exportStoryToExcel } = require('@/lib/excel-utils');
+        const { exportStoryToExcel } = jest.requireMock('@/lib/excel-utils');
         exportStoryToExcel.mockResolvedValue(new Blob());
 
         render(<ExportDropdown story={mockStory} />);
@@ -118,7 +118,7 @@ describe('ExportDropdown', () => {
             setAttribute: jest.fn(),
             style: {},
         };
-        jest.spyOn(document, 'createElement').mockReturnValue(mockLink as any);
+        jest.spyOn(document, 'createElement').mockReturnValue(mockLink as unknown as HTMLAnchorElement);
         jest.spyOn(document.body, 'appendChild').mockImplementation();
         jest.spyOn(document.body, 'removeChild').mockImplementation();
 
@@ -191,7 +191,7 @@ describe('ExportDropdown', () => {
     });
 
     it('템플릿 선택 시 해당 템플릿으로 Markdown이 생성된다', async () => {
-        const { generateMarkdownFromTemplate } = require('@/lib/markdown-template');
+        const { generateMarkdownFromTemplate } = jest.requireMock('@/lib/markdown-template');
 
         render(<ExportDropdown story={mockStory} />);
 

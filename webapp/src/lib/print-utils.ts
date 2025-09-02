@@ -3,7 +3,7 @@
  * 요구사항: FR-033 ~ FR-038
  */
 
-import { WordMeaning, StoryDifficulty, StoryResponse } from './english-story.types';
+import { WordMeaning, StoryResponse } from './english-story.types';
 
 /**
  * 날짜를 프린트용 형식으로 포맷팅
@@ -11,13 +11,13 @@ import { WordMeaning, StoryDifficulty, StoryResponse } from './english-story.typ
  * @returns YYYY-MM-DD HH:mm 형식의 문자열
  */
 export function formatDateForPrint(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
 
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
 /**
@@ -27,24 +27,24 @@ export function formatDateForPrint(date: Date): string {
  * @returns 프린트용으로 변환된 텍스트
  */
 export function cleanTextForPrint(text: string, words: WordMeaning[]): string {
-    let cleanedText = text;
+  let cleanedText = text;
 
-    // 기존 HTML 태그를 제거하고 프린트용 클래스로 대체
-    words.forEach(word => {
-        const regex = new RegExp(
-            `<span[^>]*>${word.englishWord}</span>`,
-            'gi'
-        );
-        cleanedText = cleanedText.replace(
-            regex,
-            `<span class="print-keyword">${word.englishWord}</span>`
-        );
-    });
+  // 기존 HTML 태그를 제거하고 프린트용 클래스로 대체
+  words.forEach(word => {
+    const regex = new RegExp(
+      `<span[^>]*>${word.englishWord}</span>`,
+      'gi'
+    );
+    cleanedText = cleanedText.replace(
+      regex,
+      `<span class="print-keyword">${word.englishWord}</span>`
+    );
+  });
 
-    // 다른 모든 style 속성 제거
-    cleanedText = cleanedText.replace(/style="[^"]*"/g, '');
+  // 다른 모든 style 속성 제거
+  cleanedText = cleanedText.replace(/style="[^"]*"/g, '');
 
-    return cleanedText;
+  return cleanedText;
 }
 
 /**
@@ -53,10 +53,10 @@ export function cleanTextForPrint(text: string, words: WordMeaning[]): string {
  * @returns 프린트용 HTML 문자열
  */
 export function generatePrintContent(story: StoryResponse): string {
-    const currentDate = formatDateForPrint(new Date());
-    const cleanedStory = cleanTextForPrint(story.englishStory, story.usedWords);
+  const currentDate = formatDateForPrint(new Date());
+  const cleanedStory = cleanTextForPrint(story.englishStory, story.usedWords);
 
-    return `
+  return `
     <!DOCTYPE html>
     <html lang="ko">
     <head>
@@ -226,36 +226,36 @@ export function generatePrintContent(story: StoryResponse): string {
  * @param story 프린트할 스토리 데이터
  */
 export function printStory(story: StoryResponse): void {
-    try {
-        // 새 창에서 프린트 컨텐츠 열기
-        const printWindow = window.open('', '_blank');
+  try {
+    // 새 창에서 프린트 컨텐츠 열기
+    const printWindow = window.open('', '_blank');
 
-        if (!printWindow) {
-            throw new Error('팝업이 차단되었습니다. 팝업을 허용해주세요.');
-        }
-
-        const printContent = generatePrintContent(story);
-
-        printWindow.document.write(printContent);
-        printWindow.document.close();
-
-        // 로딩 완료 후 프린트 실행
-        printWindow.addEventListener('load', () => {
-            printWindow.focus();
-            printWindow.print();
-            printWindow.close();
-        });
-
-    } catch (error) {
-        console.error('프린트 실행 중 오류 발생:', error);
-
-        // 폴백: 현재 페이지에서 프린트
-        if (typeof window !== 'undefined' && window.print) {
-            window.print();
-        } else {
-            throw new Error('프린트 기능을 사용할 수 없습니다.');
-        }
+    if (!printWindow) {
+      throw new Error('팝업이 차단되었습니다. 팝업을 허용해주세요.');
     }
+
+    const printContent = generatePrintContent(story);
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // 로딩 완료 후 프린트 실행
+    printWindow.addEventListener('load', () => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    });
+
+  } catch (error) {
+    console.error('프린트 실행 중 오류 발생:', error);
+
+    // 폴백: 현재 페이지에서 프린트
+    if (typeof window !== 'undefined' && window.print) {
+      window.print();
+    } else {
+      throw new Error('프린트 기능을 사용할 수 없습니다.');
+    }
+  }
 }
 
 /**
@@ -264,5 +264,5 @@ export function printStory(story: StoryResponse): void {
  * @returns 미리보기용 HTML
  */
 export function generatePrintPreview(story: StoryResponse): string {
-    return generatePrintContent(story);
+  return generatePrintContent(story);
 }

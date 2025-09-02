@@ -4,7 +4,8 @@ import {
     StoryDifficulty,
     StoryResponse,
     validateWordMeanings,
-    resolveAmbiguousWords
+    resolveAmbiguousWords,
+    generatePrompt
 } from './english-story';
 
 describe('영어 단어 기반 스토리 생성 기능', () => {
@@ -101,6 +102,45 @@ describe('영어 단어 기반 스토리 생성 기능', () => {
 
             expect(resolved[0].koreanMeaning).toBe('달리다');
             // '운영하다', '흐르다' 등의 다른 의미가 아닌 '달리다'로 해석되어야 함
+        });
+
+        test('여러 의미를 세미콜론으로 구분하여 입력할 수 있어야 한다', () => {
+            const words: WordMeaning[] = [
+                { englishWord: 'bank', koreanMeaning: 'n.은행; 강둑; 저축' },
+                { englishWord: 'run', koreanMeaning: 'v.달리다; 운영하다; 흐르다' }
+            ];
+
+            expect(() => validateWordMeanings(words)).not.toThrow();
+
+            const resolved = resolveAmbiguousWords(words);
+            expect(resolved[0].koreanMeaning).toBe('n.은행; 강둑; 저축');
+            expect(resolved[1].koreanMeaning).toBe('v.달리다; 운영하다; 흐르다');
+        });
+
+        test('여러 의미를 쉼표로 구분하여 입력할 수 있어야 한다', () => {
+            const words: WordMeaning[] = [
+                { englishWord: 'bank', koreanMeaning: '은행, 강둑, 저축' },
+                { englishWord: 'light', koreanMeaning: 'adj.가벼운, 밝은; n.빛' }
+            ];
+
+            expect(() => validateWordMeanings(words)).not.toThrow();
+
+            const resolved = resolveAmbiguousWords(words);
+            expect(resolved[0].koreanMeaning).toBe('은행, 강둑, 저축');
+            expect(resolved[1].koreanMeaning).toBe('adj.가벼운, 밝은; n.빛');
+        });
+
+        test('LLM에게 여러 의미가 포함된 프롬프트가 전달되어야 한다', () => {
+            const words: WordMeaning[] = [
+                { englishWord: 'bank', koreanMeaning: 'n.은행; 강둑' },
+                { englishWord: 'run', koreanMeaning: 'v.달리다; 운영하다' }
+            ];
+
+            const prompt = generatePrompt(words, 'medium');
+
+            expect(prompt).toContain('"bank" (n.은행; 강둑)');
+            expect(prompt).toContain('"run" (v.달리다; 운영하다)');
+            expect(prompt).toContain('품사 표기가 있는 경우 해당 품사로 사용');
         });
     });
 
@@ -211,14 +251,49 @@ describe('영어 단어 기반 스토리 생성 기능', () => {
             );
         });
 
-        test('특수 문자가 포함된 단어는 거부되어야 한다', () => {
+        test('영어 단어에 허용되지 않는 특수 문자가 포함된 경우 거부되어야 한다', () => {
             const invalidWords: WordMeaning[] = [
                 { englishWord: 'test123', koreanMeaning: '테스트' },
-                { englishWord: 'test!', koreanMeaning: '테스트' }
+                { englishWord: 'test!', koreanMeaning: '테스트' },
+                { englishWord: 'test@', koreanMeaning: '테스트' }
             ];
 
             expect(() => validateWordMeanings(invalidWords)).toThrow(
-                '영어 단어는 알파벳만 포함해야 합니다.'
+                '영어 단어는 알파벳, 공백, 점, 하이픈만 포함해야 합니다.'
+            );
+        });
+
+        test('영어 단어에 허용되는 특수 문자(점, 하이픈)는 통과되어야 한다', () => {
+            const validWords: WordMeaning[] = [
+                { englishWord: 'Mr.', koreanMeaning: '씨' },
+                { englishWord: 'self-control', koreanMeaning: '자제력' },
+                { englishWord: 'twenty-one', koreanMeaning: '스물하나' }
+            ];
+
+            expect(() => validateWordMeanings(validWords)).not.toThrow();
+        });
+
+        test('한국어 의미에 일반적인 특수 문자가 포함된 경우 통과되어야 한다', () => {
+            const validWords: WordMeaning[] = [
+                { englishWord: 'test', koreanMeaning: 'n.테스트' },
+                { englishWord: 'beautiful', koreanMeaning: 'adj.아름다운' },
+                { englishWord: 'run', koreanMeaning: 'v.달리다' },
+                { englishWord: 'number', koreanMeaning: '숫자(1,2,3)' },
+                { englishWord: 'example', koreanMeaning: '예) 사례' }
+            ];
+
+            expect(() => validateWordMeanings(validWords)).not.toThrow();
+        });
+
+        test('한국어 의미에 허용되지 않는 특수 문자가 포함된 경우 거부되어야 한다', () => {
+            const invalidWords: WordMeaning[] = [
+                { englishWord: 'test', koreanMeaning: '테스트@' },
+                { englishWord: 'test', koreanMeaning: '테스트#' },
+                { englishWord: 'test', koreanMeaning: '테스트$' }
+            ];
+
+            expect(() => validateWordMeanings(invalidWords)).toThrow(
+                '한국어 의미에 허용되지 않은 특수문자가 포함되어 있습니다.'
             );
         });
     });

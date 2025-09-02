@@ -30,11 +30,18 @@ export function validateWordMeanings(
             throw new StoryGenerationError('영어 단어와 한국어 의미는 모두 입력되어야 합니다.');
         }
 
+        // 영어 단어 검증 (특수문자 허용 여부에 따라)
         if (!allowSpecialChars) {
-            const englishPattern = /^[a-zA-Z\s]+$/;
+            const englishPattern = /^[a-zA-Z\s.-]+$/; // 점과 하이픈 허용 (ex: Mr., self-control)
             if (!englishPattern.test(word.englishWord)) {
-                throw new StoryGenerationError('영어 단어는 알파벳만 포함해야 합니다.');
+                throw new StoryGenerationError('영어 단어는 알파벳, 공백, 점, 하이픈만 포함해야 합니다.');
             }
+        }
+
+        // 한국어 의미는 더 유연하게 검증 (특수문자 허용)
+        const koreanPattern = /^[\u3131-\u3163\uAC00-\uD7A3a-zA-Z0-9\s.,();-]+$/; // 한글, 영문, 숫자, 기본 특수문자, 세미콜론 허용
+        if (!koreanPattern.test(word.koreanMeaning)) {
+            throw new StoryGenerationError('한국어 의미에 허용되지 않은 특수문자가 포함되어 있습니다.');
         }
     }
 }
@@ -104,12 +111,19 @@ export function generatePrompt(words: WordMeaning[], difficulty: StoryDifficulty
 
 단어 목록: ${wordList}
 
+**한국어 의미 해석 가이드:**
+- "n.단어" = 명사로 사용 (noun)
+- "v.단어" = 동사로 사용 (verb)  
+- "adj.단어" = 형용사로 사용 (adjective)
+- "adv.단어" = 부사로 사용 (adverb)
+- 품사 표기가 없는 경우는 문맥에 맞게 자연스럽게 사용
+
 난이도: ${difficulty}
 ${difficultyInstructions[difficulty]}
 
 요구사항:
 1. 모든 단어가 이야기에 자연스럽게 포함되어야 합니다
-2. 각 단어는 사용자가 제공한 한국어 의미에 맞게 사용되어야 합니다
+2. 각 단어는 사용자가 제공한 한국어 의미에 맞게 사용되어야 합니다 (품사 표기가 있는 경우 해당 품사로 사용)
 3. 논리적이고 일관성 있는 스토리여야 합니다
 4. 완전한 문장들로 구성되어야 합니다
 5. 흥미롭고 교육적인 내용이어야 합니다

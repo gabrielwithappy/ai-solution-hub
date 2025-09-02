@@ -19,6 +19,10 @@ AI를 활용한 영어 학습 도구 모음입니다. 영어 문장 생성, 스�
 - 한국어 해석 토글
 - TTS 음성 재생
 - 다의어 처리
+- **통합 내보내기 기능**:
+  - 클립보드 복사
+  - Excel 내보내기
+  - Markdown 내보내기 (다중 템플릿 지원)
 
 ### ⏳ 축하 문구 생성 (예정)
 
@@ -142,6 +146,93 @@ webapp/
 - **Deployment**: Vercel (권장)
 
 ## 🌟 주요 기능 설명
+
+### Markdown 템플릿 시스템
+
+영어 스토리를 다양한 형식의 Markdown 문서로 내보낼 수 있습니다.
+
+#### 사용 가능한 템플릿
+
+1. **기본 템플릿 (`default`)**
+   - 깔끔한 기본 형식
+   - 제목, 날짜, 난이도, 단어 목록, 스토리, 번역 포함
+
+2. **학습용 템플릿 (`study`)**
+   - 학습에 최적화된 형식
+   - 테이블 형태의 단어 목록
+   - 인용 블록으로 강조된 스토리
+   - 학습 팁 포함
+
+3. **진도 관리 템플릿 (`progress`)**
+   - Front Matter 메타데이터 포함
+   - 체크리스트 형태의 단어 목록
+   - 학습 진도 추적 체크박스
+
+#### 템플릿 파일 위치
+
+```
+webapp/src/templates/
+├── story-default.md     # 기본 템플릿
+├── story-study.md       # 학습용 템플릿
+└── story-progress.md    # 진도 관리 템플릿
+```
+
+#### 템플릿 커스터마이징
+
+새로운 템플릿을 추가하려면:
+
+1. **템플릿 파일 생성**
+
+   ```markdown
+   # {{title}}
+   
+   **생성일:** {{date}}
+   **난이도:** {{difficulty}}
+   
+   ## 단어 목록
+   {{#each words}}
+   - **{{englishWord}}**: {{koreanMeaning}}
+   {{/each}}
+   
+   ## 스토리
+   {{englishStory}}
+   ```
+
+2. **템플릿 엔진에 등록**
+
+   ```typescript
+   // src/lib/markdown-template.ts
+   export const AVAILABLE_TEMPLATES = {
+     default: 'story-default.md',
+     study: 'story-study.md',
+     progress: 'story-progress.md',
+     custom: 'story-custom.md'  // 새 템플릿 추가
+   } as const;
+   ```
+
+3. **템플릿 내용 추가**
+
+   ```typescript
+   const TEMPLATE_CONTENTS: Record<TemplateType, string> = {
+     // ... 기존 템플릿들
+     custom: `여기에 새 템플릿 내용 작성`
+   };
+   ```
+
+#### 템플릿 변수
+
+사용 가능한 변수들:
+
+- `{{title}}`: 문서 제목
+- `{{date}}`: 생성 날짜
+- `{{difficulty}}`: 난이도 (한국어)
+- `{{difficultyEn}}`: 난이도 (영어)
+- `{{wordCount}}`: 단어 개수
+- `{{englishStory}}`: 영어 스토리 (HTML 태그 제거됨)
+- `{{koreanTranslation}}`: 한국어 번역
+- `{{#each words}}...{{/each}}`: 단어 목록 반복
+  - `{{englishWord}}`: 영어 단어
+  - `{{koreanMeaning}}`: 한국어 의미
 
 ### LLM Provider 자동 선택
 

@@ -60,6 +60,52 @@ export function generateExcelFilename(date?: Date): string {
 }
 
 /**
+ * 스토리 데이터를 Excel Blob으로 생성
+ * @param story 스토리 데이터
+ * @returns Excel 파일 Blob
+ */
+export async function exportStoryToExcel(story: StoryResponse): Promise<Blob> {
+    try {
+        // Excel 데이터 생성
+        const excelData = generateExcelData(story);
+
+        // 워크시트 생성
+        const worksheet = XLSX.utils.json_to_sheet(excelData, {
+            skipHeader: true  // 첫 번째 행이 이미 헤더이므로 자동 헤더 생성 비활성화
+        });
+
+        // 워크북 생성
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'English Words');
+
+        // 컬럼 너비 설정
+        worksheet['!cols'] = [
+            { width: 20 }, // English Word
+            { width: 20 }, // Korean Meaning
+            { width: 25 }, // Story Title
+            { width: 15 }  // Creation Date
+        ];
+
+        // Excel 파일 생성
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: 'xlsx',
+            type: 'array'
+        });
+
+        // Blob 생성 및 반환
+        const blob = new Blob([excelBuffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        return blob;
+
+    } catch (error) {
+        console.error('Excel 파일 생성 중 오류 발생:', error);
+        throw new Error('Excel 파일을 생성할 수 없습니다.');
+    }
+}
+
+/**
  * 스토리 데이터를 Excel 파일로 내보내기
  * @param story 스토리 데이터
  */

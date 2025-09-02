@@ -6,6 +6,7 @@ import { ExcelImportData } from '@/lib/excel-import-utils';
 import { createTTSUtility } from '@/lib/tts';
 import { PrintButton } from '@/components/PrintButton';
 import { ExcelExportButton } from '@/components/ExcelExportButton';
+import { ExportDropdown } from '@/components/ExportDropdown';
 import ExcelImportButton from '@/components/ExcelImportButton';
 import LoadingIndicator from '@/components/ui/LoadingIndicator';
 import Button from '@/components/ui/Button';
@@ -93,14 +94,6 @@ export default function EnglishStoryPage() {
             const cleanText = stripHtmlTags(story.englishStory);
             ttsUtility.speak(cleanText);
         }
-    };
-
-    const copyToClipboard = (text: string) => {
-        // HTML 태그 제거 후 클립보드에 복사
-        const cleanText = stripHtmlTags(text);
-        navigator.clipboard.writeText(cleanText).then(() => {
-            alert('클립보드에 복사되었습니다.');
-        });
     };
 
     // Excel 업로드 처리 함수들
@@ -267,17 +260,7 @@ export default function EnglishStoryPage() {
                                         size="md"
                                         showPreview={false}
                                     />
-                                    <ExcelExportButton
-                                        story={story}
-                                        variant="secondary"
-                                        size="md"
-                                    />
-                                    <Button
-                                        onClick={() => copyToClipboard(story.englishStory)}
-                                        className="h-10 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-                                    >
-                                        복사
-                                    </Button>
+                                    <ExportDropdown story={story} />
                                 </div>
                             </div>
 

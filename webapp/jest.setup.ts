@@ -38,4 +38,27 @@ if (typeof window !== 'undefined') {
         })),
         writable: true
     });
+
+    // Navigator clipboard API mocking
+    Object.defineProperty(navigator, 'clipboard', {
+        value: {
+            writeText: jest.fn()
+        },
+        writable: true
+    });
+
+    // URL API mocking
+    Object.defineProperty(global, 'URL', {
+        value: {
+            createObjectURL: jest.fn(),
+            revokeObjectURL: jest.fn()
+        },
+        writable: true
+    });
+
+    // Alert API mocking
+    Object.defineProperty(window, 'alert', {
+        value: jest.fn(),
+        writable: true
+    });
 }
